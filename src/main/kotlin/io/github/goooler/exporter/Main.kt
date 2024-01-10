@@ -3,10 +3,8 @@ package io.github.goooler.exporter
 import java.io.File
 import java.io.FileOutputStream
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.CellType
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
-
 
 fun main() {
   val folders = listOf(
@@ -17,38 +15,38 @@ fun main() {
   val workbook = HSSFWorkbook()
   val sheet = workbook.createSheet("Sheet1")
 
-  val defaultResColumn: StringResColumn = mutableMapOf()
-  val resColumns = mutableListOf<StringResColumn>()
+  val defaultColumn: StringResColumn = mutableMapOf()
+  val columns = mutableListOf<StringResColumn>()
   val firstRow = sheet.createRow(0).apply {
-    createCell(0, CellType.STRING).setCellValue("key")
+    createCell(0).setCellValue("key")
   }
 
   folders.forEachIndexed { index, folder ->
     val inputStream = StringRes::class.java.getResourceAsStream("/$folder/strings.xml")
     val elements = SAXBuilder().build(inputStream).rootElement.children
 
-    resColumns += if (folder == "values") {
-      fillNewColumn(defaultResColumn, elements)
+    columns += if (folder == "values") {
+      fillNewColumn(defaultColumn, elements)
     } else {
-      val emptyColumn: StringResColumn = defaultResColumn.mapValues { null }.toMutableMap()
+      val emptyColumn: StringResColumn = defaultColumn.mapValues { null }.toMutableMap()
       fillNewColumn(emptyColumn, elements)
     }
-    firstRow.createCell(index + 1, CellType.STRING).setCellValue(folder)
+    firstRow.createCell(index + 1).setCellValue(folder)
   }
 
-  resColumns.forEachIndexed { columnIndex, column ->
-    column.entries.forEachIndexed { rowIndex, entry ->
+  columns.forEachIndexed { columnIndex, column ->
+    column.entries.forEachIndexed { rowIndex, stringRes ->
+      val realRowIndex = rowIndex + 1
       if (columnIndex == 0) {
-        sheet.createRow(rowIndex + 1).createCell(0, CellType.STRING).setCellValue(entry.key)
+        sheet.createRow(realRowIndex).createCell(0).setCellValue(stringRes.key)
       }
-      sheet.getRow(rowIndex + 1).createCell(columnIndex + 1, CellType.STRING)
-        .setCellValue(entry.value?.value.orEmpty())
+      sheet.getRow(realRowIndex).createCell(columnIndex + 1)
+        .setCellValue(stringRes.value?.value.orEmpty())
     }
   }
 
   FileOutputStream(File("./output.xls")).use { fos ->
-    workbook.write(fos)
-    workbook.close()
+    workbook.use { it.write(fos) }
   }
 }
 

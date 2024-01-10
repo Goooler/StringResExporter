@@ -10,7 +10,7 @@ java {
 
 dependencies {
   implementation("org.apache.poi:poi:5.2.0")
-  implementation("org.jdom:jdom2:2.0.6")
+  implementation("org.jdom:jdom2:2.0.6.1")
 
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
