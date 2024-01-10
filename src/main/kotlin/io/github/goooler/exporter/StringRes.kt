@@ -5,3 +5,5 @@ data class StringRes(
   val value: String,
   val translatable: Boolean = true,
 )
+
+typealias StringResColumn = MutableMap<String, StringRes?>

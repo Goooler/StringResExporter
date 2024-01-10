@@ -4,7 +4,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
 import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.inputStream
@@ -13,7 +12,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
 
-fun res2xml(inputPath: String, outputPath: String) {
+fun res2xls(inputPath: String, outputPath: String) {
   val workbook = HSSFWorkbook()
   val sheet = workbook.createSheet("Sheet1")
 
@@ -75,5 +74,3 @@ private fun fillNewColumn(
   }
   return column
 }
-
-typealias StringResColumn = MutableMap<String, StringRes?>
