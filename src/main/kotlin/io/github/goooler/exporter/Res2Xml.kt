@@ -13,16 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
 
-fun res2xml(args: Array<String> = arrayOf("/Users/goooler/StudioProjects/lawnchair/res")) {
-  val errorMessage = "Please input the res folder path"
-  check(args.size == 1) {
-    errorMessage
-  }
-  val resFolder = Paths.get(args.first())
-  check(resFolder.exists() && resFolder.isDirectory()) {
-    errorMessage
-  }
-
+fun res2xml(inputPath: String, outputPath: String) {
   val workbook = HSSFWorkbook()
   val sheet = workbook.createSheet("Sheet1")
 
@@ -32,7 +23,7 @@ fun res2xml(args: Array<String> = arrayOf("/Users/goooler/StudioProjects/lawncha
     createCell(0).setCellValue("key")
   }
 
-  resFolder.listDirectoryEntries("values*").asSequence()
+  Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
     .sorted()
     .map {
       it.resolve("strings.xml")
@@ -64,7 +55,7 @@ fun res2xml(args: Array<String> = arrayOf("/Users/goooler/StudioProjects/lawncha
     }
   }
 
-  FileOutputStream(File("./output.xls")).use { fos ->
+  FileOutputStream(File(outputPath, "output.xls")).use { fos ->
     workbook.use { it.write(fos) }
   }
 }
