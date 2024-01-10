@@ -46,6 +46,28 @@ val fatJar by tasks.registering(Jar::class) {
   )
 }
 
+val archivesBaseName: String by project
+val r8File = layout.buildDirectory.file("libs/$archivesBaseName-$version-r8.jar").get().asFile
+val rulesFile = project.file("src/main/rules.txt")
+val r8Jar by tasks.registering(JavaExec::class) {
+  val fatJarFile = fatJar.get().archiveFile
+  dependsOn(fatJar)
+  inputs.file(fatJarFile)
+  inputs.file(rulesFile)
+  outputs.file(r8File)
+
+  classpath(r8)
+  mainClass = "com.android.tools.r8.R8"
+  args(
+    "--release",
+    "--classfile",
+    "--output", r8File.toString(),
+    "--pg-conf", rulesFile.path,
+    "--lib", System.getProperty("java.home"),
+    fatJarFile.get().toString()
+  )
+}
+
 spotless {
   kotlin {
     ktlint()
@@ -56,10 +78,13 @@ spotless {
   }
 }
 
+val r8: Configuration by configurations.creating
 
 dependencies {
   implementation("org.apache.poi:poi:5.2.0")
   implementation("org.jdom:jdom2:2.0.6.1")
+
+  r8("com.android.tools:r8:8.2.42")
 
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
