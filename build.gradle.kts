@@ -9,6 +9,12 @@ java {
   toolchain.languageVersion = JavaLanguageVersion.of(8)
 }
 
+tasks.jar {
+  manifest {
+    attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
+  }
+}
+
 spotless {
   kotlin {
     ktlint()
