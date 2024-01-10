@@ -14,4 +14,3 @@ dependencyResolutionManagement {
     mavenCentral()
   }
 }
-

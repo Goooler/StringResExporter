@@ -1,11 +1,22 @@
 plugins {
   kotlin("jvm") version "1.9.21"
+  id("com.diffplug.spotless") version "6.23.3"
 }
 
 version = "0.1.0-SNAPSHOT"
 
 java {
   toolchain.languageVersion = JavaLanguageVersion.of(8)
+}
+
+spotless {
+  kotlin {
+    ktlint()
+    target("**/src/*.kt")
+  }
+  kotlinGradle {
+    ktlint()
+  }
 }
 
 dependencies {
