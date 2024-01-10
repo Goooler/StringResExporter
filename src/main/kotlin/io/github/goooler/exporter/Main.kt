@@ -20,7 +20,14 @@ fun main(args: Array<String>) {
     errorMessage
   }
 
-  val folders = resFolder.listDirectoryEntries("values*").sorted()
+  val stringResFiles = resFolder.listDirectoryEntries("values*").asSequence()
+    .sorted()
+    .map {
+      it.resolve("strings.xml")
+    }
+    .filter {
+      it.isRegularFile() && it.exists()
+    }
 
   val workbook = HSSFWorkbook()
   val sheet = workbook.createSheet("Sheet1")
@@ -31,12 +38,10 @@ fun main(args: Array<String>) {
     createCell(0).setCellValue("key")
   }
 
-  folders.forEachIndexed { index, folder ->
-    val xmlFile = folder.resolve("strings.xml").takeIf { it.exists() } ?: return@forEachIndexed
-    val inputStream = xmlFile.inputStream()
-    val elements = SAXBuilder().build(inputStream).rootElement.children
+  stringResFiles.forEachIndexed { index, file ->
+    val elements = SAXBuilder().build(file.inputStream()).rootElement.children
 
-    val folderName = folder.name
+    val folderName = file.parent.name
     columns += if (folderName == "values") {
       fillNewColumn(defaultColumn, elements)
     } else {
