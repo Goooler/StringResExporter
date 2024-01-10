@@ -15,6 +15,37 @@ tasks.jar {
   }
 }
 
+val fatJar by tasks.registering(Jar::class) {
+  dependsOn(configurations.runtimeClasspath)
+  dependsOn(tasks.jar)
+
+  archiveClassifier = "fat"
+
+  manifest {
+    attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
+    attributes["Implementation-Version"] = archiveVersion
+  }
+
+  from(files(sourceSets.main.map { it.output.classesDirs }))
+  from(configurations.runtimeClasspath.get().asFileTree.files.map { zipTree(it) })
+
+  exclude(
+    "**/*.kotlin_metadata",
+    "**/*.kotlin_builtins",
+    "**/*.kotlin_module",
+    "**/module-info.class",
+    "META-INF/maven/**",
+    "META-INF/proguard/**",
+    "META-INF/*.version",
+    "**/*.proto",
+    "**/*.dex",
+    "**/LICENSE**",
+    "**/NOTICE**",
+    "r8-version.properties",
+    "migrateToAndroidx/*",
+  )
+}
+
 spotless {
   kotlin {
     ktlint()
@@ -24,6 +55,7 @@ spotless {
     ktlint()
   }
 }
+
 
 dependencies {
   implementation("org.apache.poi:poi:5.2.0")
