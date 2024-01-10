@@ -64,8 +64,25 @@ val r8Jar by tasks.registering(JavaExec::class) {
     "--output", r8File.toString(),
     "--pg-conf", rulesFile.path,
     "--lib", System.getProperty("java.home"),
-    fatJarFile.get().toString()
+    fatJarFile.get().toString(),
   )
+}
+
+val binaryFile = layout.buildDirectory.file("libs/$archivesBaseName-$version-binary.jar").get().asFile
+val binaryJar by tasks.registering(Task::class) {
+  dependsOn(r8Jar)
+
+  inputs.file(r8File)
+  outputs.file(binaryFile)
+
+  doLast {
+    binaryFile.parentFile.mkdirs()
+    binaryFile.delete()
+    binaryFile.writeText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
+    r8File.inputStream().use { binaryFile.appendBytes(it.readBytes()) }
+
+    binaryFile.setExecutable(true, false)
+  }
 }
 
 spotless {
