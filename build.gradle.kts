@@ -85,6 +85,14 @@ val binaryJar by tasks.registering(Task::class) {
   }
 }
 
+tasks.build {
+  dependsOn(binaryJar)
+}
+
+tasks.test {
+  useJUnitPlatform()
+}
+
 spotless {
   kotlin {
     ktlint()
@@ -104,8 +112,4 @@ dependencies {
   r8("com.android.tools:r8:8.2.42")
 
   testImplementation("org.jetbrains.kotlin:kotlin-test")
-}
-
-tasks.test {
-  useJUnitPlatform()
 }
