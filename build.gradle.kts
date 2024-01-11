@@ -4,12 +4,15 @@ plugins {
 }
 
 version = "0.1.0-SNAPSHOT"
+val archivesBaseName = "string-res-exporter"
 
 java {
   toolchain.languageVersion = JavaLanguageVersion.of(8)
 }
 
 tasks.jar {
+  archiveBaseName = archivesBaseName
+
   manifest {
     attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
   }
@@ -46,7 +49,6 @@ val fatJar by tasks.registering(Jar::class) {
   )
 }
 
-val archivesBaseName: String by project
 val r8File = layout.buildDirectory.file("libs/$archivesBaseName-$version-r8.jar").get().asFile
 val rulesFile = project.file("src/main/rules.txt")
 val r8Jar by tasks.registering(JavaExec::class) {
