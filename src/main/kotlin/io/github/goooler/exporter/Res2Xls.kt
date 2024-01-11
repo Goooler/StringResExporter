@@ -12,9 +12,11 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
 
+const val STRING_RES_SHEET = "String"
+
 fun res2xls(inputPath: String, outputPath: String) {
   val workbook = HSSFWorkbook()
-  val sheet = workbook.createSheet("Sheet1")
+  val sheet = workbook.createSheet(STRING_RES_SHEET)
 
   val defaultColumn: StringResColumn = mutableMapOf()
   val columns = mutableListOf<StringResColumn>()

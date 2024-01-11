@@ -1,17 +1,17 @@
 package io.github.goooler.exporter
 
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 fun xls2res(inputPath: String, outputPath: String) {
   val workbook = WorkbookFactory.create(FileInputStream(File(inputPath)))
-  val sheet = workbook.getSheetAt(0)
+  val sheet = workbook.getSheet(STRING_RES_SHEET)
   val stringResMap = mutableMapOf<String, MutableList<StringRes>>()
 
   sheet.rowIterator().asSequence().drop(1).forEach { row ->
