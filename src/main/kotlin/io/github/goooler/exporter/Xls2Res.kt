@@ -1,8 +1,8 @@
 package io.github.goooler.exporter
 
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.nio.file.Paths
+import kotlin.io.path.inputStream
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.Document
 import org.jdom2.Element
@@ -10,7 +10,7 @@ import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 
 fun xls2res(inputPath: String, outputPath: String) {
-  val workbook = WorkbookFactory.create(FileInputStream(File(inputPath)))
+  val workbook = WorkbookFactory.create(Paths.get(inputPath).inputStream())
   val sheet = workbook.getSheet(STRING_RES_SHEET)
   val stringResMap = mutableMapOf<String, MutableList<StringRes>>()
 
@@ -19,16 +19,19 @@ fun xls2res(inputPath: String, outputPath: String) {
     row.cellIterator().asSequence().drop(1).forEachIndexed { index, cell ->
       val folderName = sheet.getRow(0).getCell(index + 1).stringCellValue
       val value = cell.stringCellValue
-      stringResMap.getOrPut(folderName) { mutableListOf() }.add(StringRes(key, value))
+      stringResMap.getOrPut(folderName) {
+        mutableListOf()
+      }.add(StringRes(key, value))
     }
   }
 
   stringResMap.forEach { (folderName, stringResList) ->
     val rootElement = Element("resources")
     stringResList.forEach { stringRes ->
-      val stringElement = Element("string")
-      stringElement.setAttribute("name", stringRes.name)
-      stringElement.text = stringRes.value
+      val stringElement = Element("string").apply {
+        setAttribute("name", stringRes.name)
+        text = stringRes.value
+      }
       rootElement.addContent(stringElement)
     }
 
@@ -36,6 +39,6 @@ fun xls2res(inputPath: String, outputPath: String) {
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
     val outputFile = File(outputPath, "$folderName/strings.xml")
     outputFile.parentFile.mkdirs()
-    xmlOutputter.output(document, FileOutputStream(outputFile))
+    xmlOutputter.output(document, outputFile.outputStream())
   }
 }

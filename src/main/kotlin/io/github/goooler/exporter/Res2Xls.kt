@@ -32,10 +32,10 @@ fun res2xls(inputPath: String, outputPath: String) {
     .filter {
       it.isRegularFile() && it.exists()
     }
-    .forEachIndexed { index, file ->
-      val elements = SAXBuilder().build(file.inputStream()).rootElement.children
+    .forEachIndexed { index, path ->
+      val elements = SAXBuilder().build(path.inputStream()).rootElement.children
 
-      val folderName = file.parent.name
+      val folderName = path.parent.name
       columns += if (folderName == "values") {
         fillNewColumn(defaultColumn, elements)
       } else {
