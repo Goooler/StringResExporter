@@ -12,3 +12,6 @@
 
 # Used by poi.
 -keepclassmembers class org.apache.logging.log4j.** { *; }
+-dontwarn aQute.bnd.**
+-dontwarn org.osgi.**
+-dontwarn edu.umd.cs.findbugs.annotations.**
