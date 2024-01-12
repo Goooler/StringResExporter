@@ -89,10 +89,7 @@ val binaryJar by tasks.registering(Task::class) {
 
 tasks.test {
   dependsOn(binaryJar)
-  systemProperty("CLI-PATH", binaryFile.absolutePath)
-  javaLauncher = javaToolchains.launcherFor {
-    languageVersion = JavaLanguageVersion.of(11)
-  }
+  systemProperty("CLI_PATH", binaryFile.absolutePath)
 
   useJUnitPlatform()
 }

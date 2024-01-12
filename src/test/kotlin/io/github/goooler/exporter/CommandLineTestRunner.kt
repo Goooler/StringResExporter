@@ -17,8 +17,8 @@ class CommandLineTestRunner(
       directory(tempDir.toFile())
     }.start()
 
-    val stdin = InputStream.nullInputStream()
-    process.outputStream.use(stdin::copyTo)
+/*    val stdin = InputStream.nullInputStream()
+    process.outputStream.use(stdin::copyTo)*/
 
     // Give the process some time to complete
     (0..WAIT_INTERVAL_MAX_OCCURRENCES).forEach { _ ->
