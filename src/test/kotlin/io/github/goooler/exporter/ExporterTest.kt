@@ -1,5 +1,7 @@
 package io.github.goooler.exporter
 
+import assertk.assertThat
+import assertk.assertions.isTrue
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
@@ -23,6 +25,6 @@ class ExporterTest {
 
     CommandLineTestRunner(tempDir, "--res2xls", inputPath.absolutePathString(), outputPath)
 
-    assert(Paths.get(outputPath).resolve("output.xls").exists())
+    assertThat(Paths.get(outputPath).resolve("output.xls").exists()).isTrue()
   }
 }
