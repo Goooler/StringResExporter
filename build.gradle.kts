@@ -93,7 +93,7 @@ val binaryJar by tasks.registering(Task::class) {
 
 tasks.test {
   dependsOn(binaryJar)
-  systemProperty("CLI_PATH", binaryFile.absolutePath)
+  systemProperty("CLI_PATH", binaryFile.get().absolutePath)
 
   useJUnitPlatform()
 }
