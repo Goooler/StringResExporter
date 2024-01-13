@@ -5,8 +5,9 @@ import assertk.assertions.isTrue
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.copyToRecursively
 import kotlin.io.path.exists
-import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -15,16 +16,21 @@ class ExporterTest {
   @Test
   fun res2xls(@TempDir tempDir: Path) {
     val inputPath = tempDir.resolve("res")
-    inputPath.outputStream().buffered().use {
-      tempDir::class.java.getResourceAsStream("/res")!!.copyTo(it)
-    }
     val outputPath = tempDir.absolutePathString()
 
-    println("inputPath  " + inputPath.absolutePathString())
-    println("outputPath  " + outputPath)
+    val sourcePath = Paths.get(this::class.java.getResource("/res")!!.toURI())
+    sourcePath.copyToRecursively(inputPath)
 
-    CommandLineTestRunner(tempDir, "--res2xls", inputPath.absolutePathString(), outputPath)
+    println("inputPath:  ${inputPath.absolutePathString()}")
+    println("outputPath:  $outputPath")
+
+    CommandLineTestRunner(tempDir, "--res2xls", inputPath.absolutePathString(), outputPath).run()
 
     assertThat(Paths.get(outputPath).resolve("output.xls").exists()).isTrue()
+  }
+
+  @OptIn(ExperimentalPathApi::class)
+  private fun Path.copyToRecursively(target: Path) {
+    copyToRecursively(target, followLinks = true, overwrite = true)
   }
 }
