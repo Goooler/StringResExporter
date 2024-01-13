@@ -4,17 +4,19 @@ plugins {
 }
 
 version = "0.1.1-SNAPSHOT"
-val archivesBaseName = "string-res-exporter"
+val baseName = "string-res-exporter"
 
 java {
   toolchain.languageVersion = JavaLanguageVersion.of(8)
 }
 
-tasks.jar {
-  archiveBaseName = archivesBaseName
+tasks.withType<Jar>().configureEach {
+  archiveBaseName = baseName
+  archiveVersion = version.toString()
 
   manifest {
     attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
+    attributes["Implementation-Version"] = version.toString()
   }
 }
 
@@ -22,15 +24,10 @@ val fatJar by tasks.registering(Jar::class) {
   dependsOn(configurations.runtimeClasspath)
   dependsOn(tasks.jar)
 
+  from(sourceSets.main.map { it.output.classesDirs })
+  from(configurations.runtimeClasspath.map { it.asFileTree.files.map(::zipTree) })
+
   archiveClassifier = "fat"
-
-  manifest {
-    attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
-    attributes["Implementation-Version"] = archiveVersion
-  }
-
-  from(files(sourceSets.main.map { it.output.classesDirs }))
-  from(configurations.runtimeClasspath.get().asFileTree.files.map { zipTree(it) })
 
   exclude(
     "**/*.kotlin_metadata",
@@ -49,11 +46,12 @@ val fatJar by tasks.registering(Jar::class) {
   )
 }
 
-val r8File = layout.buildDirectory.file("libs/$archivesBaseName-$version-r8.jar").get().asFile
-val rulesFile = project.file("src/main/rules.txt")
+val r8File = layout.buildDirectory.file("libs/$baseName-$version-r8.jar").get().asFile
+val rulesFile = project.file("src/main/rules.pro")
 val r8Jar by tasks.registering(JavaExec::class) {
-  val fatJarFile = fatJar.get().archiveFile
   dependsOn(fatJar)
+
+  val fatJarFile = fatJar.get().archiveFile
   inputs.file(fatJarFile)
   inputs.file(rulesFile)
   outputs.file(r8File)
@@ -70,7 +68,7 @@ val r8Jar by tasks.registering(JavaExec::class) {
   )
 }
 
-val binaryFile = layout.buildDirectory.file("libs/$archivesBaseName-$version-binary.jar").get().asFile
+val binaryFile = layout.buildDirectory.file("libs/$baseName-$version-binary.jar").get().asFile
 val binaryJar by tasks.registering(Task::class) {
   dependsOn(r8Jar)
 
