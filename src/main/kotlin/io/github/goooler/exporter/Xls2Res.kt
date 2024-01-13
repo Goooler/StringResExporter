@@ -41,4 +41,6 @@ fun xls2res(inputPath: String, outputPath: String) {
     outputFile.parentFile.mkdirs()
     xmlOutputter.output(document, outputFile.outputStream())
   }
+
+  println("$SUCCESS_OUTPUT $outputPath")
 }

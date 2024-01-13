@@ -8,3 +8,5 @@ fun main(args: Array<String>) {
     else -> error("Unknown command: $command")
   }
 }
+
+const val SUCCESS_OUTPUT = "Convert finished, output path:"

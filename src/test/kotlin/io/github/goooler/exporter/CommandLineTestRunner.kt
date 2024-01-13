@@ -16,9 +16,12 @@ class CommandLineTestRunner(
     }.start()
     process.waitFor()
     val err = process.errorStream.readBytes().toString(StandardCharsets.UTF_8)
-//    val out = process.inputStream.readBytes().toString(StandardCharsets.UTF_8)
+    val out = process.inputStream.readBytes().toString(StandardCharsets.UTF_8)
     if (err.isNotEmpty()) {
       error("Error occurred when running command line: $err")
+    }
+    if (!out.startsWith(SUCCESS_OUTPUT)) {
+      error("Output is not correct: $out")
     }
   }
 

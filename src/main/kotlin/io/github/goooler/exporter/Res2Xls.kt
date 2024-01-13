@@ -56,9 +56,12 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
   }
 
-  FileOutputStream(File(outputPath, "output.xls")).use { fos ->
+  val outputFile = File(outputPath, "output.xls")
+  FileOutputStream(outputFile).use { fos ->
     workbook.use { it.write(fos) }
   }
+
+  println("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
 }
 
 private fun fillNewColumn(
