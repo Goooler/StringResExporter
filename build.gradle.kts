@@ -51,7 +51,7 @@ val fatJar by tasks.registering(Jar::class) {
 }
 
 val r8File = layout.buildDirectory.file("libs/$archivesBaseName-$version-r8.jar").get().asFile
-val rulesFile = project.file("src/main/rules.txt")
+val rulesFile = project.file("src/main/rules.pro")
 val r8Jar by tasks.registering(JavaExec::class) {
   val fatJarFile = fatJar.get().archiveFile
   dependsOn(fatJar)
