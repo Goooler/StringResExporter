@@ -5,13 +5,13 @@ import assertk.assertions.containsExactly
 import assertk.assertions.isTrue
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.copyToRecursively
+import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.exists
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -26,7 +26,7 @@ class ExporterTest {
       tempDir,
       "--res2xls",
       importedRes.absolutePathString(),
-      tempDir.absolutePathString()
+      tempDir.absolutePathString(),
     ).run()
 
     val exportedXls = tempDir.resolve("output.xls")

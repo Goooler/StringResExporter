@@ -100,7 +100,7 @@ tasks.test {
 spotless {
   kotlin {
     ktlint()
-    target("**/src/*.kt")
+    target("**/src/**/*.kt")
   }
   kotlinGradle {
     ktlint()
