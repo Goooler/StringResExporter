@@ -4,10 +4,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
 import kotlin.io.path.exists
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.name
 import kotlin.io.path.inputStream
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
@@ -56,9 +56,21 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
   }
 
-  FileOutputStream(File(outputPath, "output.xls")).use { fos ->
+  val outputFile = File(outputPath, "output.xls")
+  FileOutputStream(outputFile).use { fos ->
     workbook.use { it.write(fos) }
   }
+
+  println("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
+}
+
+internal fun Element.toStringRes(): StringRes? {
+  if (name != "string") return null
+  val key = getAttributeValue("name") ?: return null
+  return StringRes(
+    name = key,
+    value = text,
+  )
 }
 
 private fun fillNewColumn(
@@ -66,12 +78,7 @@ private fun fillNewColumn(
   elements: List<Element>,
 ): StringResColumn {
   elements.forEach { element ->
-    if (element.name != "string") return@forEach
-    val key = element.getAttributeValue("name") ?: return@forEach
-    val stringRes = StringRes(
-      name = key,
-      value = element.text,
-    )
+    val stringRes = element.toStringRes() ?: return@forEach
     column[stringRes.name] = stringRes
   }
   return column

@@ -90,18 +90,17 @@ val binaryJar by tasks.registering(Task::class) {
   }
 }
 
-tasks.build {
-  dependsOn(binaryJar)
-}
-
 tasks.test {
+  dependsOn(binaryJar)
+  systemProperty("CLI_PATH", binaryFile.get().absolutePath)
+
   useJUnitPlatform()
 }
 
 spotless {
   kotlin {
     ktlint()
-    target("**/src/*.kt")
+    target("**/src/**/*.kt")
   }
   kotlinGradle {
     ktlint()
@@ -116,5 +115,6 @@ dependencies {
 
   r8("com.android.tools:r8:8.2.42")
 
-  testImplementation("org.jetbrains.kotlin:kotlin-test")
+  testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
+  testImplementation("com.willowtreeapps.assertk:assertk:0.28.0")
 }
