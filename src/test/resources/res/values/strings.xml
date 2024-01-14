@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
   <string name="lib_coil">Coil</string>
   <string name="lib_okhttp">OkHttp</string>
   <string name="lib_retrofit">Retrofit</string>
-
 </resources>

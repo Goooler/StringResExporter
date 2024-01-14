@@ -13,6 +13,7 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.jdom2.input.SAXBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -44,6 +45,7 @@ class ExporterTest {
 
     assertThat(exportedRes.exists()).isTrue()
     assertThat(exportedRes.listDirectoryEntries().size == 2).isTrue()
+    validateResContent(importedRes, exportedRes)
   }
 
   private fun validateXlsContent(exportedXls: Path) {
@@ -70,6 +72,32 @@ class ExporterTest {
       "",
     )
     assertThat(sheetContent).containsExactly(*expectedContent)
+  }
+
+  private fun validateResContent(importedRes: Path, exportedRes: Path) {
+    val expected = parseRes(exportedRes)
+    val actual = parseRes(importedRes).toTypedArray()
+
+    assertThat(expected).containsExactly(*actual)
+  }
+
+  private fun parseRes(resFolder: Path): List<StringRes> {
+    val parsed = mutableListOf<StringRes>()
+    resFolder.listDirectoryEntries().asSequence()
+      .sorted()
+      .forEach { subFolder ->
+        parsed += SAXBuilder().build(
+          subFolder.resolve("strings.xml").inputStream(),
+        ).rootElement.children.asSequence()
+          .map {
+            it.toStringRes()
+          }
+          .filterIsInstance<StringRes>()
+          .filter {
+            it.value.isNotEmpty()
+          }
+      }
+    return parsed
   }
 
   @OptIn(ExperimentalPathApi::class)

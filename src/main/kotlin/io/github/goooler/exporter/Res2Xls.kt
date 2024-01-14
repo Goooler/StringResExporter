@@ -64,17 +64,21 @@ fun res2xls(inputPath: String, outputPath: String) {
   println("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
 }
 
+internal fun Element.toStringRes(): StringRes? {
+  if (name != "string") return null
+  val key = getAttributeValue("name") ?: return null
+  return StringRes(
+    name = key,
+    value = text,
+  )
+}
+
 private fun fillNewColumn(
   column: StringResColumn,
   elements: List<Element>,
 ): StringResColumn {
   elements.forEach { element ->
-    if (element.name != "string") return@forEach
-    val key = element.getAttributeValue("name") ?: return@forEach
-    val stringRes = StringRes(
-      name = key,
-      value = element.text,
-    )
+    val stringRes = element.toStringRes() ?: return@forEach
     column[stringRes.name] = stringRes
   }
   return column
