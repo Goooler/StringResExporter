@@ -37,9 +37,7 @@ class CommandLineTestRunner(
     private val cliPath = System.getProperty("CLI_PATH") ?: error("CLI_PATH must not be null.")
 
     private fun cliCommand(vararg arguments: String) = buildList {
-      add("java")
-      add("-jar")
-      add(cliPath)
+      addAll(listOf("java", "-jar", cliPath))
       addAll(arguments)
     }
   }
