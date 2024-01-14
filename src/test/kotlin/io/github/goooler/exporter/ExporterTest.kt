@@ -7,6 +7,8 @@ import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.copyToRecursively
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.exists
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -14,19 +16,30 @@ import org.junit.jupiter.api.io.TempDir
 class ExporterTest {
 
   @Test
-  fun res2xls(@TempDir tempDir: Path) {
-    val inputPath = tempDir.resolve("res")
-    val outputPath = tempDir.absolutePathString()
+  fun exportAndImport(@TempDir tempDir: Path) {
+    val importedRes = tempDir.resolve("resInput")
+    Paths.get(this::class.java.getResource("/res").toURI()).copyToRecursively(importedRes)
+    CommandLineTestRunner(
+      tempDir,
+      "--res2xls",
+      importedRes.absolutePathString(),
+      tempDir.absolutePathString()
+    ).run()
 
-    val sourcePath = Paths.get(this::class.java.getResource("/res")!!.toURI())
-    sourcePath.copyToRecursively(inputPath)
+    val exportedXls = tempDir.resolve("output.xls")
+    assertThat(exportedXls.exists()).isTrue()
+    assertThat(exportedXls.isRegularFile()).isTrue()
 
-    println("inputPath:  ${inputPath.absolutePathString()}")
-    println("outputPath:  $outputPath")
+    val exportedRes = tempDir.resolve("resOutput")
+    CommandLineTestRunner(
+      tempDir,
+      "--xls2res",
+      exportedXls.absolutePathString(),
+      exportedRes.absolutePathString(),
+    ).run()
 
-    CommandLineTestRunner(tempDir, "--res2xls", inputPath.absolutePathString(), outputPath).run()
-
-    assertThat(Paths.get(outputPath).resolve("output.xls").exists()).isTrue()
+    assertThat(exportedRes.exists()).isTrue()
+    assertThat(exportedRes.listDirectoryEntries().size == 2).isTrue()
   }
 
   @OptIn(ExperimentalPathApi::class)
