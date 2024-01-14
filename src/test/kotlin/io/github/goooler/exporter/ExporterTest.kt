@@ -59,18 +59,10 @@ class ExporterTest {
         it.stringCellValue.orEmpty()
       }.toList()
     val expectedContent = arrayOf(
-      "key",
-      "values",
-      "values-zh-rCN",
-      "lib_coil",
-      "Coil",
-      "",
-      "lib_okhttp",
-      "OkHttp",
-      "要得",
-      "lib_retrofit",
-      "Retrofit",
-      "",
+      "key", "values", "values-zh-rCN",
+      "lib_coil", "Coil", "",
+      "lib_okhttp", "OkHttp", "要得",
+      "lib_retrofit", "Retrofit", "",
     )
     assertThat(sheetContent).containsExactly(*expectedContent)
   }
