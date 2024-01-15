@@ -54,7 +54,11 @@ class ExporterTest {
     val sheetContent = workbook.getSheet(STRING_RES_SHEET)
       .asSequence()
       .flatMap {
-        listOf(it.getCell(0), it.getCell(1), it.getCell(2), it.getCell(3))
+        buildList {
+          for (i in 0 until it.lastCellNum) {
+            add(it.getCell(i))
+          }
+        }
       }.map {
         it.stringCellValue.orEmpty()
       }.toList()
