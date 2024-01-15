@@ -3,7 +3,7 @@ plugins {
   id("com.diffplug.spotless") version "6.24.0"
 }
 
-version = "0.1.1-SNAPSHOT"
+version = "0.1.1"
 val baseName = "string-res-exporter"
 
 java {
