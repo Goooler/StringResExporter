@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+  <!--Strings-->
+
   <string name="first">first</string>
   <string name="second">second</string>
   <string name="third">third</string>
   <string name="forth">forth</string>
   <string name="fifth">fifth</string>
+
+  <!--Plurals-->
+
+  <plurals name="apples">
+    <item quantity="one">apple</item>
+    <item quantity="other">apples</item>
+  </plurals>
+
+  <plurals name="bananas">
+    <item quantity="one">banana</item>
+    <item quantity="other">bananas</item>
+  </plurals>
 
 </resources>
