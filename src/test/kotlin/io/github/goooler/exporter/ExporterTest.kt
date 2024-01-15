@@ -1,6 +1,7 @@
 package io.github.goooler.exporter
 
 import assertk.assertThat
+import assertk.assertions.containsAtLeast
 import assertk.assertions.containsExactly
 import assertk.assertions.isTrue
 import java.nio.file.Path
@@ -74,10 +75,10 @@ class ExporterTest {
   }
 
   private fun validateResContent(importedRes: Path, exportedRes: Path) {
-    val expected = parseRes(exportedRes)
-    val actual = parseRes(importedRes).toTypedArray()
+    val expected = parseRes(importedRes).toTypedArray()
+    val actual = parseRes(exportedRes).toTypedArray()
 
-    assertThat(expected).containsExactly(*actual)
+    assertThat(expected).containsAtLeast(*actual)
   }
 
   private fun parseRes(resFolder: Path): List<StringRes> {

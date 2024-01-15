@@ -39,14 +39,15 @@ fun res2xls(inputPath: String, outputPath: String) {
 
       val folderName = path.parent.name
       if (folderName == "values") {
-        fillNewColumn(elements, defaultStringColumn, defaultPluralsColumn)
+        fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn)
         stringColumns += defaultStringColumn
         pluralsColumns += defaultPluralsColumn
       } else {
         val newStringColumn: StringResColumn = defaultStringColumn.mapValues { null }.toMutableMap()
         val newPluralsColumn: PluralsResColumn = defaultPluralsColumn.mapValues { null }.toMutableMap()
-        fillNewColumn(elements, newStringColumn, newPluralsColumn)
+        fillNewColumn(false, elements, newStringColumn, newPluralsColumn)
         stringColumns += newStringColumn
+        pluralsColumns += newPluralsColumn
       }
       firstRow.createCell(index + 1).setCellValue(folderName)
     }
@@ -94,6 +95,7 @@ internal fun Element.toPluralsResOrNull(): PluralsRes? {
 }
 
 private fun fillNewColumn(
+  fillDefault: Boolean,
   elements: List<Element>,
   stringColumn: StringResColumn,
   pluralsColumn: PluralsResColumn,
@@ -102,8 +104,22 @@ private fun fillNewColumn(
     val stringRes = element.toStringResOrNull()
     val pluralsRes = element.toPluralsResOrNull()
     when {
-      stringRes != null -> stringColumn[stringRes.name] = stringRes
-      pluralsRes != null -> pluralsColumn[pluralsRes.name] = pluralsRes
+      stringRes != null -> {
+        val key = stringRes.name
+        if (fillDefault) {
+          stringColumn[key] = stringRes
+        } else if (stringColumn.containsKey(key)) {
+          stringColumn[key] = stringRes
+        }
+      }
+      pluralsRes != null -> {
+        val key = pluralsRes.name
+        if (fillDefault) {
+          pluralsColumn[key] = pluralsRes
+        } else if (pluralsColumn.containsKey(key)) {
+          pluralsColumn[key] = pluralsRes
+        }
+      }
       else -> return@forEach
     }
   }
