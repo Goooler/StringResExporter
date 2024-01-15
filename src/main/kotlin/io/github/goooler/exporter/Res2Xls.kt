@@ -18,8 +18,10 @@ fun res2xls(inputPath: String, outputPath: String) {
   val workbook = HSSFWorkbook()
   val sheet = workbook.createSheet(STRING_RES_SHEET)
 
-  val defaultColumn: StringResColumn = mutableMapOf()
-  val columns = mutableListOf<StringResColumn>()
+  val defaultStringColumn: StringResColumn = mutableMapOf()
+  val defaultPluralsColumn: PluralsResColumn = mutableMapOf()
+  val stringColumns = mutableListOf<StringResColumn>()
+  val pluralsColumns = mutableListOf<PluralsResColumn>()
   val firstRow = sheet.createRow(0).apply {
     createCell(0).setCellValue("key")
   }
@@ -36,16 +38,20 @@ fun res2xls(inputPath: String, outputPath: String) {
       val elements = SAXBuilder().build(path.inputStream()).rootElement.children
 
       val folderName = path.parent.name
-      columns += if (folderName == "values") {
-        fillNewColumn(defaultColumn, elements)
+      if (folderName == "values") {
+        fillNewColumn(elements, defaultStringColumn, defaultPluralsColumn)
+        stringColumns += defaultStringColumn
+        pluralsColumns += defaultPluralsColumn
       } else {
-        val emptyColumn: StringResColumn = defaultColumn.mapValues { null }.toMutableMap()
-        fillNewColumn(emptyColumn, elements)
+        val newStringColumn: StringResColumn = defaultStringColumn.mapValues { null }.toMutableMap()
+        val newPluralsColumn: PluralsResColumn = defaultPluralsColumn.mapValues { null }.toMutableMap()
+        fillNewColumn(elements, newStringColumn, newPluralsColumn)
+        stringColumns += newStringColumn
       }
       firstRow.createCell(index + 1).setCellValue(folderName)
     }
 
-  columns.forEachIndexed { columnIndex, column ->
+  stringColumns.forEachIndexed { columnIndex, column ->
     column.entries.forEachIndexed { rowIndex, stringRes ->
       val realRowIndex = rowIndex + 1
       if (columnIndex == 0) {
@@ -73,13 +79,32 @@ internal fun Element.toStringRes(): StringRes? {
   )
 }
 
+internal fun Element.toPluralsRes(): PluralsRes? {
+  if (name != "plurals") return null
+  val key = getAttributeValue("name") ?: return null
+  return PluralsRes(
+    name = key,
+    zero = getChild("zero")?.text.orEmpty(),
+    one = getChild("one")?.text.orEmpty(),
+    two = getChild("two")?.text.orEmpty(),
+    few = getChild("few")?.text.orEmpty(),
+    many = getChild("many")?.text.orEmpty(),
+    other = getChild("other")?.text.orEmpty(),
+  )
+}
+
 private fun fillNewColumn(
-  column: StringResColumn,
   elements: List<Element>,
-): StringResColumn {
+  stringColumn: StringResColumn,
+  pluralsColumn: PluralsResColumn,
+) {
   elements.forEach { element ->
-    val stringRes = element.toStringRes() ?: return@forEach
-    column[stringRes.name] = stringRes
+    val stringRes = element.toStringRes()
+    val pluralsRes = element.toPluralsRes()
+    when {
+      stringRes != null -> stringColumn[stringRes.name] = stringRes
+      pluralsRes != null -> pluralsColumn[pluralsRes.name] = pluralsRes
+      else -> return@forEach
+    }
   }
-  return column
 }
