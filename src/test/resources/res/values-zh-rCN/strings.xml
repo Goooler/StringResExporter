@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="lib_okhttp">要得</string>
+
+  <string name="second">第二</string>
+  <string name="fifth">第五</string>
+  <string name="sixth">第六</string>
+
 </resources>
