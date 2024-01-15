@@ -37,10 +37,10 @@ fun res2xls(inputPath: String, outputPath: String) {
 
       val folderName = path.parent.name
       columns += if (folderName == "values") {
-        fillNewColumn(defaultColumn, elements)
+        fillNewColumn(defaultColumn, elements, true)
       } else {
         val emptyColumn: StringResColumn = defaultColumn.mapValues { null }.toMutableMap()
-        fillNewColumn(emptyColumn, elements)
+        fillNewColumn(emptyColumn, elements, false)
       }
       firstRow.createCell(index + 1).setCellValue(folderName)
     }
@@ -76,10 +76,16 @@ internal fun Element.toStringRes(): StringRes? {
 private fun fillNewColumn(
   column: StringResColumn,
   elements: List<Element>,
+  fillDefault: Boolean,
 ): StringResColumn {
   elements.forEach { element ->
     val stringRes = element.toStringRes() ?: return@forEach
-    column[stringRes.name] = stringRes
+    val key = stringRes.name
+    if (fillDefault) {
+      column[key] = stringRes
+    } else if (column.containsKey(key)) {
+      column[key] = stringRes
+    }
   }
   return column
 }

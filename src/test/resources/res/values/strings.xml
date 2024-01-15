@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="lib_coil">Coil</string>
-  <string name="lib_okhttp">OkHttp</string>
-  <string name="lib_retrofit">Retrofit</string>
+
+  <string name="first">first</string>
+  <string name="second">second</string>
+  <string name="third">third</string>
+  <string name="forth">forth</string>
+  <string name="fifth">fifth</string>
+
 </resources>
