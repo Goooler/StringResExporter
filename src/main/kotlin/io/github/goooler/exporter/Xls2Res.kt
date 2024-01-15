@@ -2,12 +2,13 @@ package io.github.goooler.exporter
 
 import java.io.File
 import java.nio.file.Paths
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 import kotlin.io.path.inputStream
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.jdom2.Document
-import org.jdom2.Element
-import org.jdom2.output.Format
-import org.jdom2.output.XMLOutputter
 
 fun xls2res(inputPath: String, outputPath: String) {
   val workbook = WorkbookFactory.create(Paths.get(inputPath).inputStream())
@@ -25,21 +26,32 @@ fun xls2res(inputPath: String, outputPath: String) {
     }
   }
 
+  val dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+  val transformer = TransformerFactory.newInstance().newTransformer()
+
+  transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+  @Suppress("HttpUrlsUsage")
+  transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+
   stringResMap.forEach { (folderName, stringResList) ->
-    val rootElement = Element("resources")
+    val doc = dBuilder.newDocument()
+    val rootElement = doc.createElement("resources")
+
     stringResList.forEach { stringRes ->
-      val stringElement = Element("string").apply {
+      val stringElement = doc.createElement("string").apply {
         setAttribute("name", stringRes.name)
-        text = stringRes.value
+        textContent = stringRes.value
       }
-      rootElement.addContent(stringElement)
+      rootElement.appendChild(stringElement)
     }
 
-    val document = Document(rootElement)
-    val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
-    val outputFile = File(outputPath, "$folderName/strings.xml")
-    outputFile.parentFile.mkdirs()
-    xmlOutputter.output(document, outputFile.outputStream())
+    doc.appendChild(rootElement)
+
+    val outputFile = File(outputPath, "$folderName/strings.xml").apply {
+      parentFile.mkdirs()
+    }
+
+    transformer.transform(DOMSource(doc), StreamResult(outputFile))
   }
 
   println("$SUCCESS_OUTPUT $outputPath")

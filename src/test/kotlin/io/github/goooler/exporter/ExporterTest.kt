@@ -13,7 +13,6 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.jdom2.input.SAXBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -79,9 +78,8 @@ class ExporterTest {
     resFolder.listDirectoryEntries().asSequence()
       .sorted()
       .forEach { subFolder ->
-        parsed += SAXBuilder().build(
-          subFolder.resolve("strings.xml").inputStream(),
-        ).rootElement.children.asSequence()
+        parsed += xml2Elements(subFolder.resolve("strings.xml").toFile())
+          .asSequence()
           .map {
             it.toStringRes()
           }

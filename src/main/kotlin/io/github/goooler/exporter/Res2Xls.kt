@@ -3,14 +3,15 @@ package io.github.goooler.exporter
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
+import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.exists
-import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.jdom2.Element
-import org.jdom2.input.SAXBuilder
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
 
 const val STRING_RES_SHEET = "String"
 
@@ -33,8 +34,7 @@ fun res2xls(inputPath: String, outputPath: String) {
       it.isRegularFile() && it.exists()
     }
     .forEachIndexed { index, path ->
-      val elements = SAXBuilder().build(path.inputStream()).rootElement.children
-
+      val elements = xml2Elements(path.toFile())
       val folderName = path.parent.name
       columns += if (folderName == "values") {
         fillNewColumn(defaultColumn, elements)
@@ -65,12 +65,29 @@ fun res2xls(inputPath: String, outputPath: String) {
 }
 
 internal fun Element.toStringRes(): StringRes? {
-  if (name != "string") return null
-  val key = getAttributeValue("name") ?: return null
+  if (tagName != "string") return null
+  if (!hasAttribute("name")) return null
+  val key = getAttribute("name")
   return StringRes(
     name = key,
-    value = text,
+    value = textContent,
   )
+}
+
+internal fun xml2Elements(xmlFile: File): List<Element> {
+  val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile).apply {
+    documentElement.normalize()
+  }
+  val nList: NodeList = doc.documentElement.childNodes
+  val elements = mutableListOf<Element>()
+  for (temp in 0 until nList.length) {
+    val nNode: Node = nList.item(temp)
+    if (nNode.nodeType == Node.ELEMENT_NODE) {
+      val eElement: Element = nNode as Element
+      elements.add(eElement)
+    }
+  }
+  return elements
 }
 
 private fun fillNewColumn(
