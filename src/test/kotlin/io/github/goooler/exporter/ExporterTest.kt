@@ -45,7 +45,7 @@ class ExporterTest {
     ).run()
 
     assertThat(exportedRes.exists()).isTrue()
-    assertThat(exportedRes.listDirectoryEntries().size == 2).isTrue()
+    assertThat(exportedRes.listDirectoryEntries().size == 3).isTrue()
     validateResContent(importedRes, exportedRes)
   }
 
@@ -54,15 +54,17 @@ class ExporterTest {
     val sheetContent = workbook.getSheet(STRING_RES_SHEET)
       .asSequence()
       .flatMap {
-        listOf(it.getCell(0), it.getCell(1), it.getCell(2))
+        listOf(it.getCell(0), it.getCell(1), it.getCell(2), it.getCell(3))
       }.map {
         it.stringCellValue.orEmpty()
       }.toList()
     val expectedContent = arrayOf(
-      "key", "values", "values-zh-rCN",
-      "lib_coil", "Coil", "",
-      "lib_okhttp", "OkHttp", "要得",
-      "lib_retrofit", "Retrofit", "",
+      "key", "values", "values-it", "values-zh-rCN",
+      "first", "first", "primo", "",
+      "second", "second", "", "第二",
+      "third", "third", "", "",
+      "forth", "forth", "quarto", "",
+      "fifth", "fifth", "", "第五",
     )
     assertThat(sheetContent).containsExactly(*expectedContent)
   }
