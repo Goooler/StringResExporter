@@ -70,7 +70,7 @@ fun res2xls(inputPath: String, outputPath: String) {
   println("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
 }
 
-internal fun Element.toStringRes(): StringRes? {
+internal fun Element.toStringResOrNull(): StringRes? {
   if (name != "string") return null
   val key = getAttributeValue("name") ?: return null
   return StringRes(
@@ -79,7 +79,7 @@ internal fun Element.toStringRes(): StringRes? {
   )
 }
 
-internal fun Element.toPluralsRes(): PluralsRes? {
+internal fun Element.toPluralsResOrNull(): PluralsRes? {
   if (name != "plurals") return null
   val key = getAttributeValue("name") ?: return null
   return PluralsRes(
@@ -99,8 +99,8 @@ private fun fillNewColumn(
   pluralsColumn: PluralsResColumn,
 ) {
   elements.forEach { element ->
-    val stringRes = element.toStringRes()
-    val pluralsRes = element.toPluralsRes()
+    val stringRes = element.toStringResOrNull()
+    val pluralsRes = element.toPluralsResOrNull()
     when {
       stringRes != null -> stringColumn[stringRes.name] = stringRes
       pluralsRes != null -> pluralsColumn[pluralsRes.name] = pluralsRes

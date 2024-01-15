@@ -89,7 +89,7 @@ class ExporterTest {
           subFolder.resolve("strings.xml").inputStream(),
         ).rootElement.children.asSequence()
           .map {
-            it.toStringRes()
+            it.toStringResOrNull()
           }
           .filterIsInstance<StringRes>()
           .filter {
