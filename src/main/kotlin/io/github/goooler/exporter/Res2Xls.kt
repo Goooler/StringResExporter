@@ -83,30 +83,20 @@ internal fun Element.toStringResOrNull(): StringRes? {
 internal fun Element.toPluralsResOrNull(): PluralsRes? {
   if (name != "plurals") return null
   val key = getAttributeValue("name") ?: return null
-  var zero: String? = null
-  var one: String? = null
-  var two: String? = null
-  var few: String? = null
-  var many: String? = null
-  var other: String? = null
-  children.forEach {
-    when (it.getAttributeValue("quantity")) {
-      "zero" -> zero = it.text
-      "one" -> one = it.text
-      "two" -> two = it.text
-      "few" -> few = it.text
-      "many" -> many = it.text
-      "other" -> other = it.text
-    }
+  val quantities = listOf("zero", "one", "two", "few", "many", "other")
+  val quantityValues = quantities.map { quantity ->
+    children.firstOrNull {
+      it.getAttributeValue("quantity") == quantity
+    }?.text.orEmpty()
   }
   return PluralsRes(
     name = key,
-    zero = zero.orEmpty(),
-    one = one.orEmpty(),
-    two = two.orEmpty(),
-    few = few.orEmpty(),
-    many = many.orEmpty(),
-    other = other.orEmpty(),
+    zero = quantityValues[0],
+    one = quantityValues[1],
+    two = quantityValues[2],
+    few = quantityValues[3],
+    many = quantityValues[4],
+    other = quantityValues[5],
   )
 }
 
@@ -117,28 +107,19 @@ private fun fillNewColumn(
   pluralsColumn: PluralsResColumn,
 ) {
   elements.forEach { element ->
-    val stringRes = element.toStringResOrNull()
-    val pluralsRes = element.toPluralsResOrNull()
-    when {
-      stringRes != null -> {
-        val key = stringRes.name
-        if (fillDefault) {
-          stringColumn[key] = stringRes
-        } else if (stringColumn.containsKey(key)) {
-          stringColumn[key] = stringRes
+    val res = element.toStringResOrNull() ?: element.toPluralsResOrNull()
+    when (res) {
+      is StringRes -> {
+        if (fillDefault || stringColumn.containsKey(res.name)) {
+          stringColumn[res.name] = res
         }
       }
-
-      pluralsRes != null -> {
-        val key = pluralsRes.name
-        if (fillDefault) {
-          pluralsColumn[key] = pluralsRes
-        } else if (pluralsColumn.containsKey(key)) {
-          pluralsColumn[key] = pluralsRes
+      is PluralsRes -> {
+        if (fillDefault || pluralsColumn.containsKey(res.name)) {
+          pluralsColumn[res.name] = res
         }
       }
-
-      else -> return@forEach
+      null -> Unit
     }
   }
 }
