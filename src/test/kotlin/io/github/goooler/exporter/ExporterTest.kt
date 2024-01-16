@@ -23,8 +23,7 @@ class ExporterTest {
   @Test
   fun exportAndImport(@TempDir tempDir: Path) {
     val importedRes = tempDir.resolve("resInput")
-    val resUrl = this::class.java.getResource("/res") ?: error("Test fixture res not found")
-    Paths.get(resUrl.toURI()).copyToRecursively(importedRes)
+    Paths.get(requireResource("/res").toURI()).copyToRecursively(importedRes)
     CommandLineTestRunner(
       tempDir,
       "--res2xls",

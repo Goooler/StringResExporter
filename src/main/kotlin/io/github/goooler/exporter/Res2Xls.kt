@@ -83,14 +83,30 @@ internal fun Element.toStringResOrNull(): StringRes? {
 internal fun Element.toPluralsResOrNull(): PluralsRes? {
   if (name != "plurals") return null
   val key = getAttributeValue("name") ?: return null
+  var zero: String? = null
+  var one: String? = null
+  var two: String? = null
+  var few: String? = null
+  var many: String? = null
+  var other: String? = null
+  children.forEach {
+    when (it.getAttributeValue("quantity")) {
+      "zero" -> zero = it.text
+      "one" -> one = it.text
+      "two" -> two = it.text
+      "few" -> few = it.text
+      "many" -> many = it.text
+      "other" -> other = it.text
+    }
+  }
   return PluralsRes(
     name = key,
-    zero = getChild("zero")?.text.orEmpty(),
-    one = getChild("one")?.text.orEmpty(),
-    two = getChild("two")?.text.orEmpty(),
-    few = getChild("few")?.text.orEmpty(),
-    many = getChild("many")?.text.orEmpty(),
-    other = getChild("other")?.text.orEmpty(),
+    zero = zero.orEmpty(),
+    one = one.orEmpty(),
+    two = two.orEmpty(),
+    few = few.orEmpty(),
+    many = many.orEmpty(),
+    other = other.orEmpty(),
   )
 }
 
@@ -112,6 +128,7 @@ private fun fillNewColumn(
           stringColumn[key] = stringRes
         }
       }
+
       pluralsRes != null -> {
         val key = pluralsRes.name
         if (fillDefault) {
@@ -120,6 +137,7 @@ private fun fillNewColumn(
           pluralsColumn[key] = pluralsRes
         }
       }
+
       else -> return@forEach
     }
   }
