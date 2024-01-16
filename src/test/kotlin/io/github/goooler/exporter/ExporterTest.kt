@@ -15,21 +15,26 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.input.SAXBuilder
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class ExporterTest {
+  @TempDir
+  private lateinit var tempDir: Path
 
-  @Test
-  fun exportAndImport(@TempDir tempDir: Path) {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun exportAndImport(useCli: Boolean) {
     val importedRes = tempDir.resolve("resInput")
     Paths.get(requireResource("/res").toURI()).copyToRecursively(importedRes)
-    CommandLineTestRunner(
+    convert(
+      useCli,
       tempDir,
       "--res2xls",
       importedRes.absolutePathString(),
       tempDir.absolutePathString(),
-    ).run()
+    )
 
     val exportedXls = tempDir.resolve("output.xls")
     assertThat(exportedXls.exists()).isTrue()
@@ -37,12 +42,13 @@ class ExporterTest {
     validateXlsContent(exportedXls)
 
     val exportedRes = tempDir.resolve("resOutput")
-    CommandLineTestRunner(
+    convert(
+      useCli,
       tempDir,
       "--xls2res",
       exportedXls.absolutePathString(),
       exportedRes.absolutePathString(),
-    ).run()
+    )
 
     assertThat(exportedRes.exists()).isTrue()
     assertThat(exportedRes.listDirectoryEntries().size == 3).isTrue()
@@ -97,6 +103,25 @@ class ExporterTest {
           }
       }
     return parsed
+  }
+
+  private fun convert(
+    useCli: Boolean,
+    tempDir: Path,
+    converter: String,
+    inputPath: String,
+    outputPath: String,
+  ) {
+    if (useCli) {
+      CommandLineTestRunner(
+        tempDir,
+        converter,
+        inputPath,
+        outputPath,
+      ).run()
+    } else {
+      main(converter, inputPath, outputPath)
+    }
   }
 
   @OptIn(ExperimentalPathApi::class)
