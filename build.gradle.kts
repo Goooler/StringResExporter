@@ -1,6 +1,7 @@
 plugins {
   kotlin("jvm") version "1.9.22"
   id("com.diffplug.spotless") version "6.24.0"
+  id("com.android.lint") version "8.2.1"
 }
 
 version = "0.2.0-SNAPSHOT"
@@ -117,4 +118,6 @@ dependencies {
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
   testImplementation("com.willowtreeapps.assertk:assertk:0.28.0")
+
+  lintChecks("com.jzbrooks:assertk-lint:1.1.1")
 }
