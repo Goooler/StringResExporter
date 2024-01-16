@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsExactly
 import assertk.assertions.isTrue
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.ExperimentalPathApi
@@ -15,13 +16,12 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.input.SAXBuilder
-import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class ExporterTest {
-  @TempDir
-  private lateinit var tempDir: Path
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
@@ -127,5 +127,23 @@ class ExporterTest {
   @OptIn(ExperimentalPathApi::class)
   private fun Path.copyToRecursively(target: Path) {
     copyToRecursively(target, followLinks = true, overwrite = true)
+  }
+
+  companion object {
+    // Workaround for https://github.com/junit-team/junit5/issues/2811.
+    @JvmStatic
+    private lateinit var tempDir: Path
+
+    @JvmStatic
+    @BeforeAll
+    fun before() {
+      tempDir = Files.createTempDirectory(null)
+    }
+
+    @JvmStatic
+    @AfterAll
+    fun after() {
+      tempDir.toFile().delete()
+    }
   }
 }
