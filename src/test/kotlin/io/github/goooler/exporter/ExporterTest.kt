@@ -57,7 +57,7 @@ class ExporterTest {
 
   private fun validateXlsContent(exportedXls: Path) {
     val workbook = WorkbookFactory.create(exportedXls.inputStream())
-    val sheetContent = workbook.getSheet(STRING_RES_SHEET)
+    val sheetContent = workbook.getSheet(StringRes.TAG)
       .asSequence()
       .flatMap {
         buildList {

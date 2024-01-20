@@ -11,7 +11,7 @@ import org.jdom2.output.XMLOutputter
 
 fun xls2res(inputPath: String, outputPath: String) {
   val workbook = WorkbookFactory.create(Paths.get(inputPath).inputStream())
-  val sheet = workbook.getSheet(STRING_RES_SHEET)
+  val sheet = workbook.getSheet(StringRes.TAG)
   val stringResMap = mutableMapOf<String, MutableList<StringRes>>()
 
   sheet.rowIterator().asSequence().drop(1).forEach { row ->
