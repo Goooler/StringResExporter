@@ -88,21 +88,12 @@ internal fun Element.toStringResOrNull(): StringRes? {
 internal fun Element.toPluralsResOrNull(): PluralsRes? {
   if (name != "plurals") return null
   val key = getAttributeValue("name") ?: return null
-  val quantities = listOf("zero", "one", "two", "few", "many", "other")
-  val quantityValues = quantities.map { quantity ->
-    children.firstOrNull {
-      it.getAttributeValue("quantity") == quantity
-    }?.text.orEmpty()
+  val pluralsRes = PluralsRes(key)
+  children.forEach {
+    val quantity = it.getAttributeValue("quantity") ?: return@forEach
+    pluralsRes.values[quantity] = it.text
   }
-  return PluralsRes(
-    name = key,
-    zero = quantityValues[0],
-    one = quantityValues[1],
-    two = quantityValues[2],
-    few = quantityValues[3],
-    many = quantityValues[4],
-    other = quantityValues[5],
-  )
+  return pluralsRes
 }
 
 private fun fillNewColumn(

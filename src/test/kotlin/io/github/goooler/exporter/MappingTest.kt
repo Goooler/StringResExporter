@@ -28,7 +28,8 @@ class MappingTest {
     val pluralsResList = SAXBuilder().build(inputStream).rootElement.children.mapNotNull {
       it.toPluralsResOrNull()
     }
-    assertThat(pluralsResList.single().toString())
-      .isEqualTo("PluralsRes(name=apples, zero=, one=mela, two=, few=, many=mele, other=mele)")
+    val pluralsRes = pluralsResList.single()
+    assertThat(pluralsRes.toString()).isEqualTo("PluralsRes(name=apples)")
+    assertThat(pluralsRes.values.toString()).isEqualTo("{zero=, one=mela, two=, few=, many=mele, other=mele}")
   }
 }
