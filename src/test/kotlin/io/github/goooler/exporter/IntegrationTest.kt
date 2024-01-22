@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class ExporterTest {
+class IntegrationTest {
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
@@ -30,7 +30,6 @@ class ExporterTest {
     Paths.get(requireResource("/res").toURI()).copyToRecursively(importedRes)
     convert(
       useCli,
-      tempDir,
       "--res2xls",
       importedRes.absolutePathString(),
       tempDir.absolutePathString(),
@@ -44,7 +43,6 @@ class ExporterTest {
     val exportedRes = tempDir.resolve("resOutput")
     convert(
       useCli,
-      tempDir,
       "--xls2res",
       exportedXls.absolutePathString(),
       exportedRes.absolutePathString(),
@@ -105,20 +103,9 @@ class ExporterTest {
     return parsed
   }
 
-  private fun convert(
-    useCli: Boolean,
-    tempDir: Path,
-    converter: String,
-    inputPath: String,
-    outputPath: String,
-  ) {
+  private fun convert(useCli: Boolean, converter: String, inputPath: String, outputPath: String) {
     if (useCli) {
-      CommandLineTestRunner(
-        tempDir,
-        converter,
-        inputPath,
-        outputPath,
-      ).run()
+      CommandLineTestRunner(converter, inputPath, outputPath).run()
     } else {
       main(converter, inputPath, outputPath)
     }
