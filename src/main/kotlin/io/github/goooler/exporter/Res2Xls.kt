@@ -58,13 +58,14 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
 
   stringColumns.forEachIndexed { columnIndex, column ->
-    column.entries.forEachIndexed { rowIndex, stringRes ->
+    column.values.forEachIndexed { rowIndex, stringRes ->
       val realRowIndex = rowIndex + 1
       if (columnIndex == 0) {
-        stringSheet.createRow(realRowIndex).createCell(0).setCellValue(stringRes.key)
+        val key = stringRes?.name ?: error("Default string res keys can't be null")
+        stringSheet.createRow(realRowIndex).createCell(0).setCellValue(key)
       }
       stringSheet.getRow(realRowIndex).createCell(columnIndex + 1)
-        .setCellValue(stringRes.value?.value.orEmpty())
+        .setCellValue(stringRes?.value.orEmpty())
     }
   }
 
