@@ -3,6 +3,7 @@ package io.github.goooler.exporter
 import assertk.assertThat
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsExactly
+import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import java.nio.file.Files
 import java.nio.file.Path
@@ -49,7 +50,7 @@ class IntegrationTest {
     )
 
     assertThat(exportedRes.exists()).isTrue()
-    assertThat(exportedRes.listDirectoryEntries().size == 3).isTrue()
+    assertThat(exportedRes.listDirectoryEntries().size).isEqualTo(3)
     validateResContent(importedRes, exportedRes)
   }
 
