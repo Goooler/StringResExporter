@@ -69,6 +69,30 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
   }
 
+  pluralsColumns.forEachIndexed { columnIndex, column ->
+    column.values.forEachIndexed { rowIndex, pluralsRes ->
+      val start = rowIndex * 6 + 1
+      val end = start + 6
+      val pluralsValues = pluralsRes?.values
+      for (i in start until end) {
+        val row = pluralsSheet.getRow(i) ?: pluralsSheet.createRow(i)
+        if (columnIndex == 0) {
+          pluralsValues ?: error("Default plurals res values can't be null")
+          // Write key only once for a plurals res.
+          if (i == start) {
+            row.createCell(0).setCellValue(pluralsRes.name)
+          }
+          val quantity = pluralsValues.entries.toList()[i - start]
+          row.createCell(1).setCellValue(quantity.key)
+          row.createCell(2).setCellValue(quantity.value)
+        } else {
+          val value = pluralsValues?.run { values.toList()[i - start] }.orEmpty()
+          row.createCell(columnIndex + 2).setCellValue(value)
+        }
+      }
+    }
+  }
+
   val outputFile = File(outputPath, "output.xls")
   FileOutputStream(outputFile).use { fos ->
     workbook.use { it.write(fos) }
