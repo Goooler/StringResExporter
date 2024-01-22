@@ -17,8 +17,8 @@
   </plurals>
 
   <plurals name="bananas">
-    <item quantity="one">banana</item>
     <item quantity="other">bananas</item>
+    <item quantity="one">banana</item>
   </plurals>
 
 </resources>

@@ -5,4 +5,8 @@
   <string name="fifth">第五</string>
   <string name="sixth">第六</string>
 
+  <plurals name="oranges">
+    <item quantity="other">橙子</item>
+  </plurals>
+
 </resources>
