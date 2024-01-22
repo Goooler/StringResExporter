@@ -14,15 +14,19 @@ import org.jdom2.input.SAXBuilder
 
 fun res2xls(inputPath: String, outputPath: String) {
   val workbook = HSSFWorkbook()
-  val sheet = workbook.createSheet(StringRes.TAG)
+  val stringSheet = workbook.createSheet(StringRes.TAG).apply {
+    createRow(0).createCell(0).setCellValue("key")
+  }
+  val pluralsSheet = workbook.createSheet(PluralsRes.TAG).apply {
+    val firstRow = createRow(0)
+    firstRow.createCell(0).setCellValue("key")
+    firstRow.createCell(1).setCellValue("quantity")
+  }
 
   val defaultStringColumn: StringResColumn = mutableMapOf()
   val defaultPluralsColumn: PluralsResColumn = mutableMapOf()
   val stringColumns = mutableListOf<StringResColumn>()
   val pluralsColumns = mutableListOf<PluralsResColumn>()
-  val firstRow = sheet.createRow(0).apply {
-    createCell(0).setCellValue("key")
-  }
 
   Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
     .sorted()
@@ -47,16 +51,19 @@ fun res2xls(inputPath: String, outputPath: String) {
         stringColumns += newStringColumn
         pluralsColumns += newPluralsColumn
       }
-      firstRow.createCell(index + 1).setCellValue(folderName)
+      // key, value, value-zh-rCN...
+      stringSheet.first().createCell(index + 1).setCellValue(folderName)
+      // key, quantity, value, value-zh-rCN...
+      pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
     }
 
   stringColumns.forEachIndexed { columnIndex, column ->
     column.entries.forEachIndexed { rowIndex, stringRes ->
       val realRowIndex = rowIndex + 1
       if (columnIndex == 0) {
-        sheet.createRow(realRowIndex).createCell(0).setCellValue(stringRes.key)
+        stringSheet.createRow(realRowIndex).createCell(0).setCellValue(stringRes.key)
       }
-      sheet.getRow(realRowIndex).createCell(columnIndex + 1)
+      stringSheet.getRow(realRowIndex).createCell(columnIndex + 1)
         .setCellValue(stringRes.value?.value.orEmpty())
     }
   }
