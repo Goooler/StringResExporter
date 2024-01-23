@@ -1,6 +1,6 @@
 package io.github.goooler.exporter
 
-fun main(args: Array<String>) {
+fun main(vararg args: String) {
   val (command, inputPath, outputPath) = args
   when (command) {
     "--res2xls" -> res2xls(inputPath, outputPath)

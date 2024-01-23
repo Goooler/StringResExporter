@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+  <!--Strings-->
+
   <string name="first">primo</string>
   <string name="forth">quarto</string>
   <string name="seventh">settimo</string>
+
+  <!--Plurals-->
+
+  <plurals name="apples">
+    <item quantity="one">mela</item>
+    <item quantity="other">mele</item>
+    <item quantity="many">mele</item>
+  </plurals>
 
 </resources>

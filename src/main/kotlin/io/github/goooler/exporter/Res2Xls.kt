@@ -12,17 +12,21 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
 
-const val STRING_RES_SHEET = "String"
-
 fun res2xls(inputPath: String, outputPath: String) {
   val workbook = HSSFWorkbook()
-  val sheet = workbook.createSheet(STRING_RES_SHEET)
-
-  val defaultColumn: StringResColumn = mutableMapOf()
-  val columns = mutableListOf<StringResColumn>()
-  val firstRow = sheet.createRow(0).apply {
-    createCell(0).setCellValue("key")
+  val stringSheet = workbook.createSheet(StringRes.TAG).apply {
+    createRow(0).createCell(0).setCellValue("key")
   }
+  val pluralsSheet = workbook.createSheet(PluralsRes.TAG).apply {
+    val firstRow = createRow(0)
+    firstRow.createCell(0).setCellValue("key")
+    firstRow.createCell(1).setCellValue("quantity")
+  }
+
+  val defaultStringColumn: StringResColumn = mutableMapOf()
+  val defaultPluralsColumn: PluralsResColumn = mutableMapOf()
+  val stringColumns = mutableListOf<StringResColumn>()
+  val pluralsColumns = mutableListOf<PluralsResColumn>()
 
   Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
     .sorted()
@@ -36,23 +40,58 @@ fun res2xls(inputPath: String, outputPath: String) {
       val elements = SAXBuilder().build(path.inputStream()).rootElement.children
 
       val folderName = path.parent.name
-      columns += if (folderName == "values") {
-        fillNewColumn(defaultColumn, elements, true)
+      if (folderName == "values") {
+        fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn)
+        stringColumns += defaultStringColumn
+        pluralsColumns += defaultPluralsColumn
       } else {
-        val emptyColumn: StringResColumn = defaultColumn.mapValues { null }.toMutableMap()
-        fillNewColumn(emptyColumn, elements, false)
+        val newStringColumn: StringResColumn = defaultStringColumn.mapValues { null }.toMutableMap()
+        val newPluralsColumn: PluralsResColumn = defaultPluralsColumn.mapValues { null }.toMutableMap()
+        fillNewColumn(false, elements, newStringColumn, newPluralsColumn)
+        stringColumns += newStringColumn
+        pluralsColumns += newPluralsColumn
       }
-      firstRow.createCell(index + 1).setCellValue(folderName)
+      // key, value, value-zh-rCN...
+      stringSheet.first().createCell(index + 1).setCellValue(folderName)
+      // key, quantity, value, value-zh-rCN...
+      pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
     }
 
-  columns.forEachIndexed { columnIndex, column ->
-    column.entries.forEachIndexed { rowIndex, stringRes ->
+  stringColumns.forEachIndexed { columnIndex, column ->
+    column.values.forEachIndexed { rowIndex, stringRes ->
       val realRowIndex = rowIndex + 1
       if (columnIndex == 0) {
-        sheet.createRow(realRowIndex).createCell(0).setCellValue(stringRes.key)
+        val key = stringRes?.name ?: error("Default string res keys can't be null")
+        stringSheet.createRow(realRowIndex).createCell(0).setCellValue(key)
       }
-      sheet.getRow(realRowIndex).createCell(columnIndex + 1)
-        .setCellValue(stringRes.value?.value.orEmpty())
+      stringSheet.getRow(realRowIndex).createCell(columnIndex + 1)
+        .setCellValue(stringRes?.value.orEmpty())
+    }
+  }
+
+  pluralsColumns.forEachIndexed { columnIndex, column ->
+    column.values.forEachIndexed { rowIndex, pluralsRes ->
+      val start = rowIndex * 6 + 1
+      val end = start + 6
+      val pluralsValues = pluralsRes?.values
+      for (i in start until end) {
+        val row = pluralsSheet.getRow(i) ?: pluralsSheet.createRow(i)
+        if (columnIndex == 0) {
+          pluralsValues ?: error("Default plurals res values can't be null")
+          // Write key only once for a plurals res.
+          if (i == start) {
+            row.createCell(0).setCellValue(pluralsRes.name)
+          } else {
+            row.createCell(0).setCellValue("")
+          }
+          val quantity = pluralsValues.entries.toList()[i - start]
+          row.createCell(1).setCellValue(quantity.key)
+          row.createCell(2).setCellValue(quantity.value)
+        } else {
+          val value = pluralsValues?.run { values.toList()[i - start] }.orEmpty()
+          row.createCell(columnIndex + 2).setCellValue(value)
+        }
+      }
     }
   }
 
@@ -64,7 +103,7 @@ fun res2xls(inputPath: String, outputPath: String) {
   println("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
 }
 
-internal fun Element.toStringRes(): StringRes? {
+internal fun Element.toStringResOrNull(): StringRes? {
   if (name != "string") return null
   val key = getAttributeValue("name") ?: return null
   return StringRes(
@@ -73,19 +112,37 @@ internal fun Element.toStringRes(): StringRes? {
   )
 }
 
+internal fun Element.toPluralsResOrNull(): PluralsRes? {
+  if (name != "plurals") return null
+  val key = getAttributeValue("name") ?: return null
+  val pluralsRes = PluralsRes(key)
+  children.forEach {
+    val quantity = it.getAttributeValue("quantity") ?: return@forEach
+    pluralsRes.values[quantity] = it.text
+  }
+  return pluralsRes
+}
+
 private fun fillNewColumn(
-  column: StringResColumn,
-  elements: List<Element>,
   fillDefault: Boolean,
-): StringResColumn {
+  elements: List<Element>,
+  stringColumn: StringResColumn,
+  pluralsColumn: PluralsResColumn,
+) {
   elements.forEach { element ->
-    val stringRes = element.toStringRes() ?: return@forEach
-    val key = stringRes.name
-    if (fillDefault) {
-      column[key] = stringRes
-    } else if (column.containsKey(key)) {
-      column[key] = stringRes
+    val res = element.toStringResOrNull() ?: element.toPluralsResOrNull()
+    when (res) {
+      is StringRes -> {
+        if (fillDefault || stringColumn.containsKey(res.name)) {
+          stringColumn[res.name] = res
+        }
+      }
+      is PluralsRes -> {
+        if (fillDefault || pluralsColumn.containsKey(res.name)) {
+          pluralsColumn[res.name] = res
+        }
+      }
+      null -> Unit
     }
   }
-  return column
 }

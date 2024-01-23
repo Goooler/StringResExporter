@@ -1,19 +1,15 @@
 package io.github.goooler.exporter
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
 
 class CommandLineTestRunner(
-  private val tempDir: Path,
   private val converter: String,
   private val inputPath: String,
   private val outputPath: String,
 ) : Runnable {
 
   override fun run() {
-    val process = ProcessBuilder(cliCommand(converter, inputPath, outputPath))
-      .directory(tempDir.toFile())
-      .start()
+    val process = ProcessBuilder(cliCommand(converter, inputPath, outputPath)).start()
     val exitCode = process.waitFor()
 
     val err = process.errorStream.readBytes().toString(StandardCharsets.UTF_8)
