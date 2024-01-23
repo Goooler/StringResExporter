@@ -67,7 +67,7 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
           mutableListOf()
         }.add(pluralsRes)
       } else {
-        val pluralsRes = pluralsResMap.getValue(folderName)[index / 6]
+        val pluralsRes = pluralsResMap.getValue(folderName)[rowIndex / 6]
         pluralsRes.values[quantity] = cell.stringCellValue.orEmpty()
       }
     }
