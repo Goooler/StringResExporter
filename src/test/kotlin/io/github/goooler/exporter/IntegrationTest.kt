@@ -127,6 +127,9 @@ class IntegrationTest {
     val subPath = "strings.xml"
     val expected = parseRes(importedRes, subPath).convert()
     val actual = parseRes(exportedRes, subPath).convert().toTypedArray()
+
+    assertThat(expected.isNotEmpty()).isEqualTo(true)
+    assertThat(actual.isNotEmpty()).isEqualTo(true)
     assertThat(expected).containsAtLeast(*actual)
   }
 
@@ -134,8 +137,11 @@ class IntegrationTest {
     fun List<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
 
     val subPath = "plurals.xml"
-    val expected = parseRes(importedRes, subPath).convert()
-    val actual = parseRes(exportedRes, subPath).convert().toTypedArray()
+    val expected = parseRes(exportedRes, subPath).convert()
+    val actual = parseRes(importedRes, subPath).convert().toTypedArray()
+
+    assertThat(expected.isNotEmpty()).isEqualTo(true)
+    assertThat(actual.isNotEmpty()).isEqualTo(true)
     assertThat(expected).containsExactly(*actual)
   }
 
@@ -148,7 +154,7 @@ class IntegrationTest {
           subFolder.resolve(subPath).inputStream(),
         ).rootElement.children.asSequence()
           .map {
-            it.toStringResOrNull()
+            it.toStringResOrNull() ?: it.toPluralsResOrNull()
           }
           .filterNotNull()
       }

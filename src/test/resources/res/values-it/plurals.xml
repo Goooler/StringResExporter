@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resources>
-  <plurals name="apples">
-    <item quantity="one">mela</item>
-    <item quantity="many">mele</item>
-    <item quantity="other">mele</item>
-  </plurals>
-</resources>
