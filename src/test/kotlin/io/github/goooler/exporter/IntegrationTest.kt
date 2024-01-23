@@ -124,9 +124,8 @@ class IntegrationTest {
         it.value.isNotEmpty()
       }.toList()
 
-    val subPath = "strings.xml"
-    val expected = parseRes(importedRes, subPath).convert()
-    val actual = parseRes(exportedRes, subPath).convert().toTypedArray()
+    val expected = parseRes(importedRes, "strings.xml").convert()
+    val actual = parseRes(exportedRes, "strings.xml").convert().toTypedArray()
 
     assertThat(expected.isNotEmpty()).isEqualTo(true)
     assertThat(actual.isNotEmpty()).isEqualTo(true)
@@ -136,22 +135,21 @@ class IntegrationTest {
   private fun validatePluralsResContent(importedRes: Path, exportedRes: Path) {
     fun List<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
 
-    val subPath = "plurals.xml"
-    val expected = parseRes(exportedRes, subPath).convert()
-    val actual = parseRes(importedRes, subPath).convert().toTypedArray()
+    val expected = parseRes(importedRes, "strings.xml").convert()
+    val actual = parseRes(exportedRes, "plurals.xml").convert().toTypedArray()
 
     assertThat(expected.isNotEmpty()).isEqualTo(true)
     assertThat(actual.isNotEmpty()).isEqualTo(true)
     assertThat(expected).containsExactly(*actual)
   }
 
-  private fun parseRes(resFolder: Path, subPath: String): List<TranslatableRes> {
+  private fun parseRes(resFolder: Path, resFile: String): List<TranslatableRes> {
     val parsed = mutableListOf<TranslatableRes>()
     resFolder.listDirectoryEntries().asSequence()
       .sorted()
       .forEach { subFolder ->
         parsed += SAXBuilder().build(
-          subFolder.resolve(subPath).inputStream(),
+          subFolder.resolve(resFile).inputStream(),
         ).rootElement.children.asSequence()
           .map {
             it.toStringResOrNull() ?: it.toPluralsResOrNull()
