@@ -1,7 +1,7 @@
 plugins {
   kotlin("jvm") version "1.9.22"
   id("com.diffplug.spotless") version "6.25.0"
-  id("com.android.lint") version "8.2.1"
+  id("com.android.lint") version "8.2.2"
 }
 
 version = "0.2.0-SNAPSHOT"
