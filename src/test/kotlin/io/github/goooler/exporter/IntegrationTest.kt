@@ -15,7 +15,6 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.readText
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.input.SAXBuilder
@@ -119,40 +118,39 @@ class IntegrationTest {
   }
 
   private fun validateStringResContent(importedRes: Path, exportedRes: Path) {
-    val expected = parseRes(importedRes).toTypedArray()
-    val actual = parseRes(exportedRes).toTypedArray()
+    fun List<TranslatableRes>.convert() = asSequence()
+      .filterIsInstance<StringRes>()
+      .filter {
+        it.value.isNotEmpty()
+      }.toList()
+
+    val subPath = "strings.xml"
+    val expected = parseRes(importedRes, subPath).convert()
+    val actual = parseRes(exportedRes, subPath).convert().toTypedArray()
     assertThat(expected).containsAtLeast(*actual)
   }
 
   private fun validatePluralsResContent(importedRes: Path, exportedRes: Path) {
-    val expected = importedRes.listDirectoryEntries().asSequence().map {
-      it.resolve("plurals.xml").readText()
-    }.toList()
-    val actual = exportedRes.listDirectoryEntries().asSequence().map {
-      it.resolve("plurals.xml").readText()
-    }.toList()
+    fun List<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
 
-    assertThat(expected.size).isEqualTo(actual.size)
-    assertThat(expected[0]).isEqualTo(actual[0])
-    assertThat(expected[1]).isEqualTo(actual[1])
-    assertThat(expected[2]).isEqualTo(actual[2])
+    val subPath = "plurals.xml"
+    val expected = parseRes(importedRes, subPath).convert()
+    val actual = parseRes(exportedRes, subPath).convert().toTypedArray()
+    assertThat(expected).containsExactly(*actual)
   }
 
-  private fun parseRes(resFolder: Path): List<StringRes> {
-    val parsed = mutableListOf<StringRes>()
+  private fun parseRes(resFolder: Path, subPath: String): List<TranslatableRes> {
+    val parsed = mutableListOf<TranslatableRes>()
     resFolder.listDirectoryEntries().asSequence()
       .sorted()
       .forEach { subFolder ->
         parsed += SAXBuilder().build(
-          subFolder.resolve("strings.xml").inputStream(),
+          subFolder.resolve(subPath).inputStream(),
         ).rootElement.children.asSequence()
           .map {
             it.toStringResOrNull()
           }
-          .filterIsInstance<StringRes>()
-          .filter {
-            it.value.isNotEmpty()
-          }
+          .filterNotNull()
       }
     return parsed
   }
