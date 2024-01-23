@@ -81,6 +81,8 @@ fun res2xls(inputPath: String, outputPath: String) {
           // Write key only once for a plurals res.
           if (i == start) {
             row.createCell(0).setCellValue(pluralsRes.name)
+          } else {
+            row.createCell(0).setCellValue("")
           }
           val quantity = pluralsValues.entries.toList()[i - start]
           row.createCell(1).setCellValue(quantity.key)
