@@ -130,8 +130,12 @@ class IntegrationTest {
     }.toList()
     val actual = exportedRes.listDirectoryEntries().asSequence().map {
       it.resolve("plurals.xml").readText()
-    }.toList().toTypedArray()
-    assertThat(expected).containsExactly(*actual)
+    }.toList()
+
+    assertThat(expected.size).isEqualTo(actual.size)
+    assertThat(expected[0]).isEqualTo(actual[0])
+    assertThat(expected[1]).isEqualTo(actual[1])
+    assertThat(expected[2]).isEqualTo(actual[2])
   }
 
   private fun parseRes(resFolder: Path): List<StringRes> {
