@@ -15,6 +15,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
+import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.input.SAXBuilder
 import org.junit.jupiter.api.AfterAll
@@ -56,8 +57,12 @@ class IntegrationTest {
 
   private fun validateXlsContent(exportedXls: Path) {
     val workbook = WorkbookFactory.create(exportedXls.inputStream())
-    val sheetContent = workbook.getSheet(StringRes.TAG)
-      .asSequence()
+    validateStringResSheet(workbook.getSheet(StringRes.TAG))
+    validatePluralsResSheet(workbook.getSheet(PluralsRes.TAG))
+  }
+
+  private fun validateStringResSheet(sheet: Sheet) {
+    val sheetContent = sheet.asSequence()
       .flatMap {
         buildList {
           for (i in 0 until it.lastCellNum) {
@@ -74,6 +79,35 @@ class IntegrationTest {
       "third", "third", "", "",
       "forth", "forth", "quarto", "",
       "fifth", "fifth", "", "第五",
+    )
+    assertThat(sheetContent).containsExactly(*expectedContent)
+  }
+
+  private fun validatePluralsResSheet(sheet: Sheet) {
+    val sheetContent = sheet.asSequence()
+      .flatMap {
+        buildList {
+          for (i in 0 until it.lastCellNum) {
+            add(it.getCell(i))
+          }
+        }
+      }.map {
+        it.stringCellValue.orEmpty()
+      }.toList()
+    val expectedContent = arrayOf(
+      "key", "quantity", "values", "values-it", "values-zh-rCN",
+      "apples", "zero", "", "", "",
+      "", "one", "apple", "mela", "",
+      "", "two", "", "", "",
+      "", "few", "", "", "",
+      "", "many", "", "mele", "",
+      "", "other", "apples", "mele", "",
+      "bananas", "zero", "", "", "",
+      "", "one", "banana", "", "",
+      "", "two", "", "", "",
+      "", "few", "", "", "",
+      "", "many", "", "", "",
+      "", "other", "bananas", "", "香蕉",
     )
     assertThat(sheetContent).containsExactly(*expectedContent)
   }
