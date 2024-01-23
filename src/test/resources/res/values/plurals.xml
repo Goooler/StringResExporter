@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <plurals name="apples">
+    <item quantity="one">apple</item>
+    <item quantity="other">apples</item>
+  </plurals>
+  <plurals name="bananas">
+    <item quantity="one">banana</item>
+    <item quantity="other">bananas</item>
+  </plurals>
+</resources>

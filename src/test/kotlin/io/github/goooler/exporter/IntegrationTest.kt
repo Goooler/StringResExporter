@@ -15,6 +15,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.readText
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.input.SAXBuilder
@@ -113,10 +114,24 @@ class IntegrationTest {
   }
 
   private fun validateResContent(importedRes: Path, exportedRes: Path) {
+    validateStringResContent(importedRes, exportedRes)
+    validatePluralsResContent(importedRes, exportedRes)
+  }
+
+  private fun validateStringResContent(importedRes: Path, exportedRes: Path) {
     val expected = parseRes(importedRes).toTypedArray()
     val actual = parseRes(exportedRes).toTypedArray()
-
     assertThat(expected).containsAtLeast(*actual)
+  }
+
+  private fun validatePluralsResContent(importedRes: Path, exportedRes: Path) {
+    val expected = importedRes.listDirectoryEntries().asSequence().map {
+      it.resolve("plurals.xml").readText()
+    }.toList()
+    val actual = exportedRes.listDirectoryEntries().asSequence().map {
+      it.resolve("plurals.xml").readText()
+    }.toList().toTypedArray()
+    assertThat(expected).containsExactly(*actual)
   }
 
   private fun parseRes(resFolder: Path): List<StringRes> {
