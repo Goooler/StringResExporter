@@ -32,5 +32,15 @@ data class PluralsRes(
   }
 }
 
+data class ArrayRes(
+  override val name: String,
+  val values: List<String>,
+) : TranslatableRes() {
+  companion object {
+    val TAG: String = ArrayRes::class.java.simpleName
+  }
+}
+
 typealias StringResColumn = MutableMap<String, StringRes?>
 typealias PluralsResColumn = MutableMap<String, PluralsRes?>
+typealias ArrayResColumn = MutableMap<String, ArrayRes?>

@@ -22,11 +22,18 @@ fun res2xls(inputPath: String, outputPath: String) {
     firstRow.createCell(0).setCellValue("key")
     firstRow.createCell(1).setCellValue("quantity")
   }
+  val arraySheet = workbook.createSheet(ArrayRes.TAG).apply {
+    val firstRow = createRow(0)
+    firstRow.createCell(0).setCellValue("key")
+    firstRow.createCell(1).setCellValue("item")
+  }
 
   val defaultStringColumn: StringResColumn = mutableMapOf()
   val defaultPluralsColumn: PluralsResColumn = mutableMapOf()
+  val defaultArrayColumn: ArrayResColumn = mutableMapOf()
   val stringColumns = mutableListOf<StringResColumn>()
   val pluralsColumns = mutableListOf<PluralsResColumn>()
+  val arrayColumns = mutableListOf<ArrayResColumn>()
 
   Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
     .sorted()
@@ -41,20 +48,23 @@ fun res2xls(inputPath: String, outputPath: String) {
 
       val folderName = path.parent.name
       if (folderName == "values") {
-        fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn)
+        fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
         stringColumns += defaultStringColumn
         pluralsColumns += defaultPluralsColumn
+        arrayColumns += defaultArrayColumn
       } else {
         val newStringColumn: StringResColumn = defaultStringColumn.mapValues { null }.toMutableMap()
         val newPluralsColumn: PluralsResColumn = defaultPluralsColumn.mapValues { null }.toMutableMap()
-        fillNewColumn(false, elements, newStringColumn, newPluralsColumn)
+        val newArrayColumn: ArrayResColumn = defaultArrayColumn.mapValues { null }.toMutableMap()
+        fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
         stringColumns += newStringColumn
         pluralsColumns += newPluralsColumn
+        arrayColumns += newArrayColumn
       }
-      // key, value, value-zh-rCN...
-      stringSheet.first().createCell(index + 1).setCellValue(folderName)
       // key, quantity, value, value-zh-rCN...
+      stringSheet.first().createCell(index + 1).setCellValue(folderName)
       pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
+      arraySheet.first().createCell(index + 2).setCellValue(folderName)
     }
 
   stringColumns.forEachIndexed { columnIndex, column ->
@@ -95,6 +105,21 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
   }
 
+  arrayColumns.forEachIndexed { columnIndex, column ->
+    column.values.forEachIndexed { rowIndex, arrayRes ->
+      val realRowIndex = rowIndex + 1
+      if (columnIndex == 0) {
+        val key = arrayRes?.name ?: error("Default array res keys can't be null")
+        arraySheet.createRow(realRowIndex).createCell(0).setCellValue(key)
+      }
+      val items = arrayRes?.values.orEmpty()
+      items.forEachIndexed { _, item ->
+        val row = arraySheet.getRow(realRowIndex) ?: arraySheet.createRow(realRowIndex)
+        row.createCell(columnIndex + 1).setCellValue(item)
+      }
+    }
+  }
+
   val outputFile = File(outputPath, "output.xls")
   FileOutputStream(outputFile).use { fos ->
     workbook.use { it.write(fos) }
@@ -123,14 +148,22 @@ internal fun Element.toPluralsResOrNull(): PluralsRes? {
   return pluralsRes
 }
 
+internal fun Element.toArrayResOrNull(): ArrayRes? {
+  if (name != "array" && name != "string-array") return null
+  val key = getAttributeValue("name") ?: return null
+  val items = children.map { it.text }
+  return ArrayRes(key, items)
+}
+
 private fun fillNewColumn(
   fillDefault: Boolean,
   elements: List<Element>,
   stringColumn: StringResColumn,
   pluralsColumn: PluralsResColumn,
+  arrayColumn: ArrayResColumn,
 ) {
   elements.forEach { element ->
-    val res = element.toStringResOrNull() ?: element.toPluralsResOrNull()
+    val res = element.toStringResOrNull() ?: element.toPluralsResOrNull() ?: element.toArrayResOrNull()
     when (res) {
       is StringRes -> {
         if (fillDefault || stringColumn.containsKey(res.name)) {
@@ -140,6 +173,11 @@ private fun fillNewColumn(
       is PluralsRes -> {
         if (fillDefault || pluralsColumn.containsKey(res.name)) {
           pluralsColumn[res.name] = res
+        }
+      }
+      is ArrayRes -> {
+        if (fillDefault || arrayColumn.containsKey(res.name)) {
+          arrayColumn[res.name] = res
         }
       }
       null -> Unit
