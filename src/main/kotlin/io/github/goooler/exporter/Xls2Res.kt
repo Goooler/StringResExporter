@@ -3,6 +3,7 @@ package io.github.goooler.exporter
 import java.io.File
 import java.nio.file.Paths
 import kotlin.io.path.inputStream
+import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
@@ -27,10 +28,10 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
 
   stringSheet.rowIterator().asSequence().drop(1).forEach { row ->
     if (row.isEmpty()) return@forEach
-    val key = row.getCell(0).stringCellValue
+    val key = row.getCell(0).stringValue
     row.cellIterator().asSequence().drop(1).forEachIndexed { index, cell ->
-      val folderName = stringSheet.getRow(0).getCell(index + 1).stringCellValue
-      val value = cell.stringCellValue
+      val folderName = stringSheet.getRow(0).getCell(index + 1).stringValue
+      val value = cell.stringValue
       stringResMap.getOrPut(folderName) {
         mutableListOf()
       }.add(StringRes(key, value))
@@ -65,19 +66,19 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
   pluralsSheet.rowIterator().asSequence().drop(1).forEachIndexed { rowIndex, row ->
     if (row.isEmpty()) return@forEachIndexed
     row.cellIterator().asSequence().drop(2).forEachIndexed { index, cell ->
-      val folderName = pluralsSheet.getRow(0).getCell(index + 2).stringCellValue
-      val quantity = row.getCell(1).stringCellValue.orEmpty()
+      val folderName = pluralsSheet.getRow(0).getCell(index + 2).stringValue
+      val quantity = row.getCell(1).stringValue
       if (rowIndex % 6 == 0) {
-        val key = row.getCell(0).stringCellValue
+        val key = row.getCell(0).stringValue
         val pluralsRes = PluralsRes(key).apply {
-          values[quantity] = cell.stringCellValue.orEmpty()
+          values[quantity] = cell.stringValue
         }
         pluralsResMap.getOrPut(folderName) {
           mutableListOf()
         }.add(pluralsRes)
       } else {
         val pluralsRes = pluralsResMap.getValue(folderName)[rowIndex / 6]
-        pluralsRes.values[quantity] = cell.stringCellValue.orEmpty()
+        pluralsRes.values[quantity] = cell.stringValue
       }
     }
   }
@@ -111,5 +112,18 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
     xmlOutputter.output(document, outputFile.outputStream())
   }
 }
+
+internal val Cell.stringValue: String
+  get() {
+    val original = try {
+      stringCellValue
+    } catch (_: IllegalStateException) {
+      error("Cell in sheet ${sheet.sheetName} row $rowIndex and column $columnIndex is not a string.")
+    }
+    return original.trim().replace(NBSP, SPACE)
+  }
+
+internal const val NBSP = '\u00A0'
+internal const val SPACE = '\u0020'
 
 private fun Row.isEmpty(): Boolean = all { it.stringCellValue.trim().isEmpty() }
