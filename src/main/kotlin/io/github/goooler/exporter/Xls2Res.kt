@@ -3,6 +3,7 @@ package io.github.goooler.exporter
 import java.io.File
 import java.nio.file.Paths
 import kotlin.io.path.inputStream
+import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.Document
@@ -25,6 +26,7 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
   val stringResMap = mutableMapOf<String, MutableList<StringRes>>()
 
   stringSheet.rowIterator().asSequence().drop(1).forEach { row ->
+    if (row.isEmpty()) return@forEach
     val key = row.getCell(0).stringCellValue
     row.cellIterator().asSequence().drop(1).forEachIndexed { index, cell ->
       val folderName = stringSheet.getRow(0).getCell(index + 1).stringCellValue
@@ -61,6 +63,7 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
   val pluralsResMap = mutableMapOf<String, MutableList<PluralsRes>>()
 
   pluralsSheet.rowIterator().asSequence().drop(1).forEachIndexed { rowIndex, row ->
+    if (row.isEmpty()) return@forEachIndexed
     row.cellIterator().asSequence().drop(2).forEachIndexed { index, cell ->
       val folderName = pluralsSheet.getRow(0).getCell(index + 2).stringCellValue
       val quantity = row.getCell(1).stringCellValue.orEmpty()
@@ -108,3 +111,5 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
     xmlOutputter.output(document, outputFile.outputStream())
   }
 }
+
+private fun Row.isEmpty(): Boolean = all { it.stringCellValue.trim().isEmpty() }
