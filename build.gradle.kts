@@ -118,6 +118,7 @@ dependencies {
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
   testImplementation("com.willowtreeapps.assertk:assertk:0.28.0")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
   lintChecks("com.jzbrooks:assertk-lint:1.1.1")
 }
