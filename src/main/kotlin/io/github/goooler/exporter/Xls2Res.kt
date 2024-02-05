@@ -1,17 +1,26 @@
 package io.github.goooler.exporter
 
 import java.io.File
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.inputStream
+import org.apache.poi.EmptyFileException
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.poifs.filesystem.FileMagic
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 
 fun xls2res(inputPath: String, outputPath: String) {
-  val workbook = WorkbookFactory.create(Paths.get(inputPath).inputStream())
+  if (!inputPath.endsWith(".xls") && !inputPath.endsWith(".xlsx")) {
+    error("Only support converting res from .xls or .xlsx file.")
+  }
+
+  val workbook = Paths.get(inputPath).toWorkbook()
   writeStrings(workbook, outputPath)
   writePlurals(workbook, outputPath)
   println("$SUCCESS_OUTPUT $outputPath")
@@ -106,5 +115,23 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
     val outputFile = File(outputPath, "$folderName/plurals.xml")
     outputFile.parentFile.mkdirs()
     xmlOutputter.output(document, outputFile.outputStream())
+  }
+}
+
+/**
+ * Copy-paste some creating logic from [WorkbookFactory.create]
+ */
+internal fun Path.toWorkbook(): Workbook {
+  val inputStream = FileMagic.prepareToCheckMagic(inputStream())
+  val emptyFileCheck = ByteArray(1)
+  inputStream.mark(emptyFileCheck.size)
+  if (inputStream.read(emptyFileCheck) < emptyFileCheck.size) {
+    throw EmptyFileException()
+  }
+  inputStream.reset()
+  return when (FileMagic.valueOf(inputStream)) {
+    FileMagic.OLE2 -> HSSFWorkbook(inputStream)
+    FileMagic.OOXML -> XSSFWorkbook(inputStream)
+    else -> error("Unsupported file type: $this")
   }
 }

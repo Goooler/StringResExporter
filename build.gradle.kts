@@ -30,9 +30,6 @@ val fatJar by tasks.registering(Jar::class) {
 
   archiveClassifier = "fat"
 
-  // Keep all META-INF/services/org.apache.poi.extractor.ExtractorProvider.
-  duplicatesStrategy = DuplicatesStrategy.WARN
-
   exclude(
     "**/*.kotlin_metadata",
     "**/*.kotlin_builtins",
@@ -41,6 +38,9 @@ val fatJar by tasks.registering(Jar::class) {
     "META-INF/maven/**",
     "META-INF/proguard/**",
     "META-INF/*.version",
+    "META-INF/services/org.apache.poi.extractor.ExtractorProvider",
+    "META-INF/services/org.apache.poi.sl.draw.ImageRenderer",
+    "META-INF/services/org.apache.poi.ss.usermodel.WorkbookProvider",
     "**/*.proto",
     "**/*.dex",
     "**/LICENSE**",
