@@ -19,7 +19,7 @@ fun xls2res(inputPath: String, outputPath: String) {
 
 internal fun writeStrings(workbook: Workbook, outputPath: String) {
   val stringSheet = workbook.getSheet(StringRes.TAG) ?: run {
-    logger.info("SHEET_NOT_FOUND ${StringRes.TAG}")
+    logger.info("Sheet ${StringRes.TAG} not found.")
     return
   }
   val stringResMap = mutableMapOf<String, MutableList<StringRes>>()
@@ -55,7 +55,7 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
 
 internal fun writePlurals(workbook: Workbook, outputPath: String) {
   val pluralsSheet = workbook.getSheet(PluralsRes.TAG) ?: run {
-    logger.info("SHEET_NOT_FOUND ${PluralsRes.TAG}")
+    logger.info("Sheet ${PluralsRes.TAG} not found.")
     return
   }
   val pluralsResMap = mutableMapOf<String, MutableList<PluralsRes>>()
