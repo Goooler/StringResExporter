@@ -11,6 +11,7 @@
 -dontwarn com.android.tools.r8.internal.**
 
 -dontwarn aQute.bnd.**
+-dontwarn net.sf.saxon.**
 -dontwarn org.osgi.**
 -dontwarn edu.umd.cs.findbugs.annotations.**
 
