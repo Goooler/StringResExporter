@@ -11,6 +11,11 @@
 -dontwarn com.android.tools.r8.internal.**
 
 -dontwarn aQute.bnd.**
+-dontwarn com.github.luben.zstd.**
+-dontwarn org.apache.batik.**
+-dontwarn org.objectweb.asm.**
+-dontwarn org.tukaani.xz.**
+-dontwarn org.brotli.dec.BrotliInputStream
 -dontwarn net.sf.saxon.**
 -dontwarn org.osgi.**
 -dontwarn edu.umd.cs.findbugs.annotations.**
