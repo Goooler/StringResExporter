@@ -1,6 +1,7 @@
 package io.github.goooler.exporter
 
 import java.io.File
+import java.io.IOException
 import java.nio.file.Paths
 import kotlin.io.path.inputStream
 import org.apache.poi.ss.usermodel.Cell
@@ -13,7 +14,12 @@ import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 
 fun xls2res(inputPath: String, outputPath: String) {
-  val workbook = WorkbookFactory.create(Paths.get(inputPath).inputStream())
+  val workbook = try {
+    WorkbookFactory.create(Paths.get(inputPath).inputStream())
+  } catch (_: IOException) {
+    // This is a trade-off for Jar size, see https://github.com/Goooler/StringResExporter/pull/23.
+    error("We support XLS file only, invalid format in $inputPath")
+  }
   writeStrings(workbook, outputPath)
   writePlurals(workbook, outputPath)
   println("$SUCCESS_OUTPUT $outputPath")
