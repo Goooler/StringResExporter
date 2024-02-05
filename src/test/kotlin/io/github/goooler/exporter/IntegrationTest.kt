@@ -29,6 +29,7 @@ class IntegrationTest {
   @ValueSource(booleans = [false, true])
   fun exportAndImport(useCli: Boolean) {
     val importedRes = tempDir.resolve("resInput")
+    val exportedXlsx = Paths.get(requireResource("/output.xlsx").toURI())
     Paths.get(requireResource("/res").toURI()).copyToRecursively(importedRes)
     convert(
       useCli,
@@ -41,18 +42,20 @@ class IntegrationTest {
     assertThat(exportedXls.exists()).isTrue()
     assertThat(exportedXls.isRegularFile()).isTrue()
     validateXlsContent(exportedXls)
+    validateXlsContent(exportedXlsx)
 
-    val exportedRes = tempDir.resolve("resOutput")
-    convert(
+    compareImportedAndExported(
       useCli,
-      "--xls2res",
-      exportedXls.absolutePathString(),
-      exportedRes.absolutePathString(),
+      importedRes,
+      exportedXls,
+      tempDir.resolve("resFromXls"),
     )
-
-    assertThat(exportedRes.exists()).isTrue()
-    assertThat(exportedRes.listDirectoryEntries().size).isEqualTo(3)
-    validateResContent(importedRes, exportedRes)
+    compareImportedAndExported(
+      useCli,
+      importedRes,
+      exportedXlsx,
+      tempDir.resolve("resFromXlsx"),
+    )
   }
 
   private fun validateXlsContent(exportedXls: Path) {
@@ -157,6 +160,24 @@ class IntegrationTest {
           .filterNotNull()
       }
     return parsed
+  }
+
+  private fun compareImportedAndExported(
+    useCli: Boolean,
+    originalRes: Path,
+    xlsPath: Path,
+    exportedRes: Path,
+  ) {
+    convert(
+      useCli,
+      "--xls2res",
+      xlsPath.absolutePathString(),
+      exportedRes.absolutePathString(),
+    )
+
+    assertThat(exportedRes.exists()).isTrue()
+    assertThat(exportedRes.listDirectoryEntries().size).isEqualTo(3)
+    validateResContent(originalRes, exportedRes)
   }
 
   private fun convert(useCli: Boolean, converter: String, inputPath: String, outputPath: String) {
