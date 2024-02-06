@@ -76,8 +76,8 @@ fun res2xls(inputPath: String, outputPath: String) {
 
   pluralsColumns.forEachIndexed { columnIndex, column ->
     column.values.forEachIndexed { rowIndex, pluralsRes ->
-      val start = rowIndex * 6 + 1
-      val end = start + 6
+      val start = rowIndex * PluralsRes.DEFAULT_VALUES.size + 1
+      val end = start + PluralsRes.DEFAULT_VALUES.size
       val pluralsValues = pluralsRes.values
       for (i in start until end) {
         val row = pluralsSheet.getRow(i) ?: pluralsSheet.createRow(i)
