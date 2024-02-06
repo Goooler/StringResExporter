@@ -103,10 +103,11 @@ fun res2xls(inputPath: String, outputPath: String) {
   }
 
   arrayColumns.forEachIndexed { columnIndex, column ->
-    var lastArrayIndex = 0
+    // Starts from 1 to skip the title row.
+    var lastArrayIndex = 1
     column.values.forEachIndexed { rowIndex, arrayRes ->
       val arrayValues = arrayRes.values
-      val start = rowIndex + lastArrayIndex + 1
+      val start = rowIndex + lastArrayIndex
       val end = start + arrayValues.size
       for (i in start until end) {
         val row = arraySheet.getRow(i) ?: arraySheet.createRow(i)
