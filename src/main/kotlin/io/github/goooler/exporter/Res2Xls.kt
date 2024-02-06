@@ -151,3 +151,5 @@ private fun fillNewColumn(
     }
   }
 }
+
+private typealias ResColumn<T> = MutableMap<String, T>

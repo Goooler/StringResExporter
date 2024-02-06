@@ -31,5 +31,3 @@ data class PluralsRes(
     )
   }
 }
-
-typealias ResColumn<T> = MutableMap<String, T>
