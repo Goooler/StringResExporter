@@ -47,16 +47,9 @@ fun res2xls(inputPath: String, outputPath: String) {
       val (first, second, third) = if (folderName == "values") {
         fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
       } else {
-        val newStringColumn: ResColumn<StringRes> = defaultStringColumn.mapValues {
-          it.value.copy(value = "")
-        }.toMutableMap()
-        val newPluralsColumn: ResColumn<PluralsRes> = defaultPluralsColumn.mapValues {
-          it.value.copy(values = PluralsRes.DEFAULT_VALUES.toMutableMap())
-        }.toMutableMap()
-        val newArrayColumn: ResColumn<ArrayRes> = defaultArrayColumn.mapValues {
-          val emptyContentValues = List(it.value.values.size) { "" }
-          it.value.copy(values = emptyContentValues)
-        }.toMutableMap()
+        val newStringColumn = defaultStringColumn.mapValues { it.value.copy() }.toMutableMap()
+        val newPluralsColumn = defaultPluralsColumn.mapValues { it.value.copy() }.toMutableMap()
+        val newArrayColumn = defaultArrayColumn.mapValues { it.value.copy() }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
       }
       stringColumns += first
@@ -86,8 +79,8 @@ fun res2xls(inputPath: String, outputPath: String) {
   pluralsColumns.forEachIndexed { columnIndex, column ->
     column.values.forEachIndexed { rowIndex, pluralsRes ->
       val pluralsValues = pluralsRes.values
-      val start = rowIndex * PluralsRes.DEFAULT_VALUES.size + 1
-      val end = start + PluralsRes.DEFAULT_VALUES.size
+      val start = rowIndex * pluralsValues.size + 1
+      val end = start + pluralsValues.size
       for (i in start until end) {
         val row = pluralsSheet.getRow(i) ?: pluralsSheet.createRow(i)
         if (columnIndex == 0) {
