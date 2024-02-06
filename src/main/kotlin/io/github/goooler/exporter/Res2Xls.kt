@@ -28,12 +28,12 @@ fun res2xls(inputPath: String, outputPath: String) {
     firstRow.createCell(1).setCellValue("item")
   }
 
-  val defaultStringColumn: StringResColumn = mutableMapOf()
-  val defaultPluralsColumn: PluralsResColumn = mutableMapOf()
-  val defaultArrayColumn: ArrayResColumn = mutableMapOf()
-  val stringColumns = mutableListOf<StringResColumn>()
-  val pluralsColumns = mutableListOf<PluralsResColumn>()
-  val arrayColumns = mutableListOf<ArrayResColumn>()
+  val defaultStringColumn: ResColumn<StringRes> = mutableMapOf()
+  val defaultPluralsColumn: ResColumn<PluralsRes> = mutableMapOf()
+  val defaultArrayColumn: ResColumn<ArrayRes> = mutableMapOf()
+  val stringColumns = mutableListOf<ResColumn<StringRes>>()
+  val pluralsColumns = mutableListOf<ResColumn<PluralsRes>>()
+  val arrayColumns = mutableListOf<ResColumn<ArrayRes>>()
 
   Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
     .sorted()
@@ -53,9 +53,9 @@ fun res2xls(inputPath: String, outputPath: String) {
         pluralsColumns += defaultPluralsColumn
         arrayColumns += defaultArrayColumn
       } else {
-        val newStringColumn: StringResColumn = defaultStringColumn.mapValues { null }.toMutableMap()
-        val newPluralsColumn: PluralsResColumn = defaultPluralsColumn.mapValues { null }.toMutableMap()
-        val newArrayColumn: ArrayResColumn = defaultArrayColumn.mapValues { null }.toMutableMap()
+        val newStringColumn: ResColumn<StringRes> = defaultStringColumn.mapValues { null }.toMutableMap()
+        val newPluralsColumn: ResColumn<PluralsRes> = defaultPluralsColumn.mapValues { null }.toMutableMap()
+        val newArrayColumn: ResColumn<ArrayRes> = defaultArrayColumn.mapValues { null }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
         stringColumns += newStringColumn
         pluralsColumns += newPluralsColumn
@@ -158,9 +158,9 @@ internal fun Element.toArrayResOrNull(): ArrayRes? {
 private fun fillNewColumn(
   fillDefault: Boolean,
   elements: List<Element>,
-  stringColumn: StringResColumn,
-  pluralsColumn: PluralsResColumn,
-  arrayColumn: ArrayResColumn,
+  stringColumn: ResColumn<StringRes>,
+  pluralsColumn: ResColumn<PluralsRes>,
+  arrayColumn: ResColumn<ArrayRes>,
 ) {
   elements.forEach { element ->
     val res = element.toStringResOrNull() ?: element.toPluralsResOrNull() ?: element.toArrayResOrNull()

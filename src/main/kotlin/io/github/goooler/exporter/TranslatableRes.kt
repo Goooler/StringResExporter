@@ -41,6 +41,4 @@ data class ArrayRes(
   }
 }
 
-typealias StringResColumn = MutableMap<String, StringRes?>
-typealias PluralsResColumn = MutableMap<String, PluralsRes?>
-typealias ArrayResColumn = MutableMap<String, ArrayRes?>
+typealias ResColumn<T> = MutableMap<String, T?>
