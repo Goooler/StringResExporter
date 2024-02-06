@@ -15,4 +15,13 @@
     <item quantity="many">mele</item>
   </plurals>
 
+  <!--Arrays-->
+
+  <array name="colors">
+    <item>rosso</item>
+    <item>verde</item>
+    <item>blu</item>
+    <item>giallo</item>
+  </array>
+
 </resources>

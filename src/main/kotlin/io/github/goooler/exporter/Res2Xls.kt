@@ -66,21 +66,21 @@ fun res2xls(inputPath: String, outputPath: String) {
 
   stringColumns.forEachIndexed { columnIndex, column ->
     column.values.forEachIndexed { rowIndex, stringRes ->
-      val realRowIndex = rowIndex + 1
+      val sheetRowIndex = rowIndex + 1
       if (columnIndex == 0) {
         val key = stringRes?.name ?: error("Default string res keys can't be null")
-        stringSheet.createRow(realRowIndex).createCell(0).setCellValue(key)
+        stringSheet.createRow(sheetRowIndex).createCell(0).setCellValue(key)
       }
-      stringSheet.getRow(realRowIndex).createCell(columnIndex + 1)
+      stringSheet.getRow(sheetRowIndex).createCell(columnIndex + 1)
         .setCellValue(stringRes?.value.orEmpty())
     }
   }
 
   pluralsColumns.forEachIndexed { columnIndex, column ->
     column.values.forEachIndexed { rowIndex, pluralsRes ->
+      val pluralsValues = pluralsRes?.values
       val start = rowIndex * 6 + 1
       val end = start + 6
-      val pluralsValues = pluralsRes?.values
       for (i in start until end) {
         val row = pluralsSheet.getRow(i) ?: pluralsSheet.createRow(i)
         if (columnIndex == 0) {
@@ -103,17 +103,28 @@ fun res2xls(inputPath: String, outputPath: String) {
   }
 
   arrayColumns.forEachIndexed { columnIndex, column ->
+    var lastArrayIndex = 0
     column.values.forEachIndexed { rowIndex, arrayRes ->
-      val realRowIndex = rowIndex + 1
-      if (columnIndex == 0) {
-        val key = arrayRes?.name ?: error("Default array res keys can't be null")
-        arraySheet.createRow(realRowIndex).createCell(0).setCellValue(key)
+      val arrayValues = arrayRes?.values
+      val start = rowIndex + lastArrayIndex + 1
+      val end = start + (arrayValues?.size ?: 0)
+      for (i in start until end) {
+        val row = arraySheet.getRow(i) ?: arraySheet.createRow(i)
+        if (columnIndex == 0) {
+          arrayValues ?: error("Default array res values can't be null")
+          // Write key only once for an array res.
+          if (i == start) {
+            row.createCell(0).setCellValue(arrayRes.name)
+          } else {
+            row.createCell(0).setCellValue("")
+          }
+          row.createCell(1).setCellValue(arrayValues[i - start])
+        } else {
+          val value = arrayValues?.get(i - start).orEmpty()
+          row.createCell(columnIndex + 1).setCellValue(value)
+        }
       }
-      val items = arrayRes?.values.orEmpty()
-      items.forEachIndexed { _, item ->
-        val row = arraySheet.getRow(realRowIndex) ?: arraySheet.createRow(realRowIndex)
-        row.createCell(columnIndex + 1).setCellValue(item)
-      }
+      lastArrayIndex = end - 1
     }
   }
 
