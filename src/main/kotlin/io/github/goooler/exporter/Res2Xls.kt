@@ -25,7 +25,6 @@ fun res2xls(inputPath: String, outputPath: String) {
   val arraySheet = workbook.createSheet(ArrayRes.TAG).apply {
     val firstRow = createRow(0)
     firstRow.createCell(0).setCellValue("key")
-    firstRow.createCell(1).setCellValue("item")
   }
 
   val defaultStringColumn: ResColumn<StringRes> = mutableMapOf()
@@ -62,7 +61,7 @@ fun res2xls(inputPath: String, outputPath: String) {
       // key, quantity, value, value-zh-rCN...
       stringSheet.first().createCell(index + 1).setCellValue(folderName)
       pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
-      arraySheet.first().createCell(index + 2).setCellValue(folderName)
+      arraySheet.first().createCell(index + 1).setCellValue(folderName)
     }
 
   stringColumns.forEachIndexed { columnIndex, column ->
