@@ -32,8 +32,7 @@ class MappingTest {
       it.toPluralsResOrNull()
     }
     val pluralsRes = pluralsResList.single()
-    assertThat(pluralsRes.toString()).isEqualTo("PluralsRes(name=apples)")
-    assertThat(pluralsRes.values.toString()).isEqualTo("{zero=, one=mela, two=, few=, many=mele, other=mele}")
+    assertThat(pluralsRes.toString()).isEqualTo("PluralsRes(name=apples, values={zero=, one=mela, two=, few=, many=mele, other=mele})")
   }
 
   @Test
