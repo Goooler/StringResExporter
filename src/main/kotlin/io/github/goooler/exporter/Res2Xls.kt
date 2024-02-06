@@ -55,7 +55,10 @@ fun res2xls(inputPath: String, outputPath: String) {
         val newPluralsColumn: ResColumn<PluralsRes> = defaultPluralsColumn.mapValues {
           it.value.copy(values = PluralsRes.DEFAULT_VALUES.toMutableMap())
         }.toMutableMap()
-        val newArrayColumn: ResColumn<ArrayRes> = defaultArrayColumn.mapValues { null }.toMutableMap()
+        val newArrayColumn: ResColumn<ArrayRes> = defaultArrayColumn.mapValues {
+          val emptyContentValues = List(it.value.values.size) { "" }
+          it.value.copy(values = emptyContentValues)
+        }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
         Triple(newStringColumn, newPluralsColumn, newArrayColumn)
       }
@@ -110,13 +113,13 @@ fun res2xls(inputPath: String, outputPath: String) {
   arrayColumns.forEachIndexed { columnIndex, column ->
     var lastArrayIndex = 0
     column.values.forEachIndexed { rowIndex, arrayRes ->
-      val arrayValues = arrayRes?.values
+      val arrayValues = arrayRes.values
       val start = rowIndex + lastArrayIndex + 1
-      val end = start + (arrayValues?.size ?: 0)
+      val end = start + arrayValues.size
       for (i in start until end) {
         val row = arraySheet.getRow(i) ?: arraySheet.createRow(i)
         if (columnIndex == 0) {
-          arrayValues ?: error("Default array res values can't be null")
+          check(arrayValues.isNotEmpty()) { "Default array res values can't be null" }
           // Write key only once for an array res.
           if (i == start) {
             row.createCell(0).setCellValue(arrayRes.name)
@@ -125,7 +128,7 @@ fun res2xls(inputPath: String, outputPath: String) {
           }
           row.createCell(1).setCellValue(arrayValues[i - start])
         } else {
-          val value = arrayValues?.get(i - start).orEmpty()
+          val value = arrayValues[i - start]
           row.createCell(columnIndex + 1).setCellValue(value)
         }
       }
@@ -190,7 +193,13 @@ private fun fillNewColumn(
       }
       is ArrayRes -> {
         if (fillDefault || arrayColumn.containsKey(res.name)) {
-          arrayColumn[res.name] = res
+          val standard = arrayColumn[res.name]?.values
+          val filled = if (standard != null) {
+            (res.values + standard).subList(0, standard.size)
+          } else {
+            res.values
+          }
+          arrayColumn[res.name] = res.copy(values = filled)
         }
       }
       null -> Unit
