@@ -17,11 +17,11 @@ data class StringRes(
 
 data class PluralsRes(
   override val name: String,
-  val values: MutableMap<String, String> = DEFAULT_VALUES,
+  val values: MutableMap<String, String> = DEFAULT_VALUES.toMutableMap(),
 ) : TranslatableRes() {
   companion object {
     val TAG: String = PluralsRes::class.java.simpleName
-    val DEFAULT_VALUES = mutableMapOf(
+    val DEFAULT_VALUES = mapOf(
       "zero" to "",
       "one" to "",
       "two" to "",

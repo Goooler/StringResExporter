@@ -49,7 +49,7 @@ fun res2xls(inputPath: String, outputPath: String) {
           it.value.copy(value = "")
         }.toMutableMap()
         val newPluralsColumn: ResColumn<PluralsRes> = defaultPluralsColumn.mapValues {
-          it.value.copy(values = PluralsRes.DEFAULT_VALUES)
+          it.value.copy(values = PluralsRes.DEFAULT_VALUES.toMutableMap())
         }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn)
         stringColumns += newStringColumn
