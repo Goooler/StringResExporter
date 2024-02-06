@@ -23,8 +23,7 @@ fun res2xls(inputPath: String, outputPath: String) {
     firstRow.createCell(1).setCellValue("quantity")
   }
   val arraySheet = workbook.createSheet(ArrayRes.TAG).apply {
-    val firstRow = createRow(0)
-    firstRow.createCell(0).setCellValue("key")
+    createRow(0).createCell(0).setCellValue("key")
   }
 
   val defaultStringColumn: ResColumn<StringRes> = mutableMapOf()
@@ -47,7 +46,6 @@ fun res2xls(inputPath: String, outputPath: String) {
       val folderName = path.parent.name
       val (first, second, third) = if (folderName == "values") {
         fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
-        Triple(defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
       } else {
         val newStringColumn: ResColumn<StringRes> = defaultStringColumn.mapValues {
           it.value.copy(value = "")
@@ -60,14 +58,15 @@ fun res2xls(inputPath: String, outputPath: String) {
           it.value.copy(values = emptyContentValues)
         }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
-        Triple(newStringColumn, newPluralsColumn, newArrayColumn)
       }
       stringColumns += first
       pluralsColumns += second
       arrayColumns += third
-      // key, quantity, value, value-zh-rCN...
+      // key, value, value-zh-rCN...
       stringSheet.first().createCell(index + 1).setCellValue(folderName)
+      // key, quantity, value, value-zh-rCN...
       pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
+      // key, value, value-zh-rCN...
       arraySheet.first().createCell(index + 1).setCellValue(folderName)
     }
 
@@ -177,7 +176,7 @@ private fun fillNewColumn(
   stringColumn: ResColumn<StringRes>,
   pluralsColumn: ResColumn<PluralsRes>,
   arrayColumn: ResColumn<ArrayRes>,
-) {
+): Triple<ResColumn<StringRes>, ResColumn<PluralsRes>, ResColumn<ArrayRes>> {
   elements.forEach { element ->
     val res = element.toStringResOrNull() ?: element.toPluralsResOrNull() ?: element.toArrayResOrNull()
     when (res) {
@@ -205,6 +204,7 @@ private fun fillNewColumn(
       null -> Unit
     }
   }
+  return Triple(stringColumn, pluralsColumn, arrayColumn)
 }
 
 private typealias ResColumn<T> = MutableMap<String, T>
