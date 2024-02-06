@@ -32,5 +32,4 @@ data class PluralsRes(
   }
 }
 
-typealias StringResColumn = MutableMap<String, StringRes?>
-typealias PluralsResColumn = MutableMap<String, PluralsRes?>
+typealias ResColumn<T> = MutableMap<String, T?>

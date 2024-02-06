@@ -23,10 +23,10 @@ fun res2xls(inputPath: String, outputPath: String) {
     firstRow.createCell(1).setCellValue("quantity")
   }
 
-  val defaultStringColumn: StringResColumn = mutableMapOf()
-  val defaultPluralsColumn: PluralsResColumn = mutableMapOf()
-  val stringColumns = mutableListOf<StringResColumn>()
-  val pluralsColumns = mutableListOf<PluralsResColumn>()
+  val defaultStringColumn: ResColumn<StringRes> = mutableMapOf()
+  val defaultPluralsColumn: ResColumn<PluralsRes> = mutableMapOf()
+  val stringColumns = mutableListOf<ResColumn<StringRes>>()
+  val pluralsColumns = mutableListOf<ResColumn<PluralsRes>>()
 
   Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
     .sorted()
@@ -45,8 +45,8 @@ fun res2xls(inputPath: String, outputPath: String) {
         stringColumns += defaultStringColumn
         pluralsColumns += defaultPluralsColumn
       } else {
-        val newStringColumn: StringResColumn = defaultStringColumn.mapValues { null }.toMutableMap()
-        val newPluralsColumn: PluralsResColumn = defaultPluralsColumn.mapValues { null }.toMutableMap()
+        val newStringColumn: ResColumn<StringRes> = defaultStringColumn.mapValues { null }.toMutableMap()
+        val newPluralsColumn: ResColumn<PluralsRes> = defaultPluralsColumn.mapValues { null }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn)
         stringColumns += newStringColumn
         pluralsColumns += newPluralsColumn
@@ -126,8 +126,8 @@ internal fun Element.toPluralsResOrNull(): PluralsRes? {
 private fun fillNewColumn(
   fillDefault: Boolean,
   elements: List<Element>,
-  stringColumn: StringResColumn,
-  pluralsColumn: PluralsResColumn,
+  stringColumn: ResColumn<StringRes>,
+  pluralsColumn: ResColumn<PluralsRes>,
 ) {
   elements.forEach { element ->
     val res = element.toStringResOrNull() ?: element.toPluralsResOrNull()
