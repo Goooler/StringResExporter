@@ -45,22 +45,20 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
     .forEachIndexed { index, path ->
       val elements = SAXBuilder().build(path.inputStream()).rootElement.children
-
       val folderName = path.parent.name
-      if (folderName == "values") {
+      val (first, second, third) = if (folderName == "values") {
         fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
-        stringColumns += defaultStringColumn
-        pluralsColumns += defaultPluralsColumn
-        arrayColumns += defaultArrayColumn
+        Triple(defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
       } else {
         val newStringColumn: ResColumn<StringRes> = defaultStringColumn.mapValues { null }.toMutableMap()
         val newPluralsColumn: ResColumn<PluralsRes> = defaultPluralsColumn.mapValues { null }.toMutableMap()
         val newArrayColumn: ResColumn<ArrayRes> = defaultArrayColumn.mapValues { null }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
-        stringColumns += newStringColumn
-        pluralsColumns += newPluralsColumn
-        arrayColumns += newArrayColumn
+        Triple(newStringColumn, newPluralsColumn, newArrayColumn)
       }
+      stringColumns += first
+      pluralsColumns += second
+      arrayColumns += third
       // key, quantity, value, value-zh-rCN...
       stringSheet.first().createCell(index + 1).setCellValue(folderName)
       pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
