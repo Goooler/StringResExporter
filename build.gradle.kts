@@ -108,6 +108,7 @@ spotless {
 val r8: Configuration by configurations.creating
 
 dependencies {
+  implementation(project(":internal"))
   implementation("org.apache.poi:poi:5.2.5")
   implementation("org.jdom:jdom2:2.0.6.1")
 
