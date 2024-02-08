@@ -2,13 +2,14 @@ plugins {
   kotlin("jvm") version "1.9.22"
   id("com.diffplug.spotless") version "6.25.0"
   id("com.android.lint") version "8.2.2"
+  id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 version = "0.2.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
 java {
-  toolchain.languageVersion = JavaLanguageVersion.of(8)
+  toolchain.languageVersion = JavaLanguageVersion.of(19)
 }
 
 tasks.withType<Jar>().configureEach {
@@ -21,14 +22,10 @@ tasks.withType<Jar>().configureEach {
   }
 }
 
-val fatJar by tasks.registering(Jar::class) {
-  dependsOn(configurations.runtimeClasspath)
+tasks.shadowJar {
+  isEnableRelocation = true
+  relocationPrefix = "shadow"
   dependsOn(tasks.jar)
-
-  from(sourceSets.main.map { it.output.classesDirs })
-  from(configurations.runtimeClasspath.map { it.asFileTree.files.map(::zipTree) })
-
-  archiveClassifier = "fat"
 
   exclude(
     "**/*.kotlin_metadata",
@@ -50,9 +47,9 @@ val fatJar by tasks.registering(Jar::class) {
 val r8File = layout.buildDirectory.file("libs/$baseName-$version-r8.jar").map { it.asFile }
 val rulesFile = project.file("src/main/rules.pro")
 val r8Jar by tasks.registering(JavaExec::class) {
-  dependsOn(fatJar)
+  dependsOn(tasks.shadowJar)
 
-  val fatJarFile = fatJar.get().archiveFile
+  val fatJarFile = tasks.shadowJar.get().outputs.files.singleFile
   inputs.file(fatJarFile)
   inputs.file(rulesFile)
   outputs.file(r8File)
@@ -65,7 +62,7 @@ val r8Jar by tasks.registering(JavaExec::class) {
     "--output", r8File.get().path,
     "--pg-conf", rulesFile.path,
     "--lib", System.getProperty("java.home"),
-    fatJarFile.get().toString(),
+    fatJarFile.toString(),
   )
 }
 
