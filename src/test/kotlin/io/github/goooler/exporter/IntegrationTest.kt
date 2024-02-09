@@ -114,7 +114,7 @@ class IntegrationTest {
   }
 
   private fun validateStringResContent(importedRes: Path, exportedRes: Path) {
-    fun List<TranslatableRes>.convert() = asSequence()
+    fun Sequence<TranslatableRes>.convert() = asSequence()
       .filterIsInstance<StringRes>()
       .filter {
         it.value.isNotEmpty()
@@ -129,7 +129,7 @@ class IntegrationTest {
   }
 
   private fun validatePluralsResContent(importedRes: Path, exportedRes: Path) {
-    fun List<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
+    fun Sequence<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
 
     val expected = parseRes(importedRes, "strings.xml").convert()
     val actual = parseRes(exportedRes, "plurals.xml").convert().toTypedArray()
@@ -140,7 +140,7 @@ class IntegrationTest {
   }
 
   private fun validateArrayResContent(importedRes: Path, exportedRes: Path) {
-    fun List<TranslatableRes>.convert() = filterIsInstance<ArrayRes>().toList()
+    fun Sequence<TranslatableRes>.convert() = filterIsInstance<ArrayRes>().toList()
 
     val expected = parseRes(importedRes, "strings.xml").convert()
     val actual = parseRes(exportedRes, "arrays.xml").convert()
@@ -153,18 +153,14 @@ class IntegrationTest {
       .containsAtLeast(*actual.flatMap(ArrayRes::values).toTypedArray())
   }
 
-  private fun parseRes(resFolder: Path, resFile: String): List<TranslatableRes> {
-    val parsed = mutableListOf<TranslatableRes>()
-    resFolder.listDirectoryEntries().asSequence()
+  private fun parseRes(resFolder: Path, resFile: String): Sequence<TranslatableRes> {
+    return resFolder.listDirectoryEntries().asSequence()
       .sorted()
-      .forEach { subFolder ->
-        parsed += SAXBuilder().build(
-          subFolder.resolve(resFile).inputStream(),
-        ).rootElement.children.asSequence()
+      .flatMap { subFolder ->
+        SAXBuilder().build(subFolder.resolve(resFile).inputStream()).rootElement.children.asSequence()
           .map { it.toStringResOrNull() ?: it.toPluralsResOrNull() ?: it.toArrayResOrNull() }
           .filterNotNull()
       }
-    return parsed
   }
 
   private fun convert(useCli: Boolean, converter: String, inputPath: String, outputPath: String) {
