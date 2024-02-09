@@ -5,12 +5,13 @@ import io.github.goooler.exporter.PluralsRes.Companion.map
 import io.github.goooler.exporter.StringRes.Companion.map
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
+import kotlin.io.path.useDirectoryEntries
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
@@ -36,35 +37,27 @@ fun res2xls(inputPath: String, outputPath: String) {
   val pluralsColumns = mutableListOf<ResColumn<PluralsRes>>()
   val arrayColumns = mutableListOf<ResColumn<ArrayRes>>()
 
-  Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
-    .sorted()
-    .map {
-      it.resolve("strings.xml")
+  parseResFiles(inputPath).forEachIndexed { index, path ->
+    val elements = SAXBuilder().build(path.inputStream()).rootElement.children
+    val folderName = path.parent.name
+    val (first, second, third) = if (folderName == "values") {
+      fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
+    } else {
+      val newStringColumn = defaultStringColumn.mapValues { it.value.map() }.toMutableMap()
+      val newPluralsColumn = defaultPluralsColumn.mapValues { it.value.map() }.toMutableMap()
+      val newArrayColumn = defaultArrayColumn.mapValues { it.value.map() }.toMutableMap()
+      fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
     }
-    .filter {
-      it.isRegularFile() && it.exists()
-    }
-    .forEachIndexed { index, path ->
-      val elements = SAXBuilder().build(path.inputStream()).rootElement.children
-      val folderName = path.parent.name
-      val (first, second, third) = if (folderName == "values") {
-        fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
-      } else {
-        val newStringColumn = defaultStringColumn.mapValues { it.value.map() }.toMutableMap()
-        val newPluralsColumn = defaultPluralsColumn.mapValues { it.value.map() }.toMutableMap()
-        val newArrayColumn = defaultArrayColumn.mapValues { it.value.map() }.toMutableMap()
-        fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
-      }
-      stringColumns += first
-      pluralsColumns += second
-      arrayColumns += third
-      // key, value, value-zh-rCN...
-      stringSheet.first().createCell(index + 1).setCellValue(folderName)
-      // key, quantity, value, value-zh-rCN...
-      pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
-      // key, value, value-zh-rCN...
-      arraySheet.first().createCell(index + 1).setCellValue(folderName)
-    }
+    stringColumns += first
+    pluralsColumns += second
+    arrayColumns += third
+    // key, value, value-zh-rCN...
+    stringSheet.first().createCell(index + 1).setCellValue(folderName)
+    // key, quantity, value, value-zh-rCN...
+    pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
+    // key, value, value-zh-rCN...
+    arraySheet.first().createCell(index + 1).setCellValue(folderName)
+  }
 
   stringColumns.forEachIndexed { columnIndex, column ->
     column.values.forEachIndexed { rowIndex, stringRes ->
@@ -169,6 +162,14 @@ internal fun Element.toArrayResOrNull(): ArrayRes? {
 
 internal fun Element.toTransResOrNull(): TranslatableRes? {
   return toStringResOrNull() ?: toPluralsResOrNull() ?: toArrayResOrNull()
+}
+
+internal fun parseResFiles(resRoot: String, resFile: String = "strings.xml"): Sequence<Path> {
+  return Paths.get(resRoot).useDirectoryEntries("values*") { path ->
+    path.sorted()
+      .map { it.resolve(resFile) }
+      .filter { it.isRegularFile() && it.exists() }
+  }
 }
 
 private fun fillNewColumn(

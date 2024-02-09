@@ -154,11 +154,10 @@ class IntegrationTest {
       .containsAtLeast(*actual.flatMap(ArrayRes::values).toTypedArray())
   }
 
-  private fun parseRes(resFolder: Path, resFile: String): Sequence<TranslatableRes> {
-    return resFolder.listDirectoryEntries().asSequence()
-      .sorted()
+  private fun parseRes(resRoot: Path, resFile: String): Sequence<TranslatableRes> {
+    return parseResFiles(resRoot.absolutePathString(), resFile)
       .flatMap { subFolder ->
-        SAXBuilder().build(subFolder.resolve(resFile).inputStream()).rootElement.children.asSequence()
+        SAXBuilder().build(subFolder.inputStream()).rootElement.children.asSequence()
           .map(Element::toTransResOrNull)
           .filterNotNull()
       }
