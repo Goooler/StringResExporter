@@ -62,16 +62,7 @@ class IntegrationTest {
   }
 
   private fun validateStringResSheet(sheet: Sheet) {
-    val sheetContent = sheet.asSequence()
-      .flatMap {
-        buildList {
-          for (i in 0 until it.lastCellNum) {
-            add(it.getCell(i))
-          }
-        }
-      }.map {
-        it.stringCellValue.orEmpty()
-      }.toList()
+    val sheetContent = sheet.stringValues
     val expectedContent = arrayOf(
       "key", "values", "values-it", "values-zh-rCN",
       "first", "first", "primo", "",
@@ -84,16 +75,7 @@ class IntegrationTest {
   }
 
   private fun validatePluralsResSheet(sheet: Sheet) {
-    val sheetContent = sheet.asSequence()
-      .flatMap {
-        buildList {
-          for (i in 0 until it.lastCellNum) {
-            add(it.getCell(i))
-          }
-        }
-      }.map {
-        it.stringCellValue.orEmpty()
-      }.toList()
+    val sheetContent = sheet.stringValues
     val expectedContent = arrayOf(
       "key", "quantity", "values", "values-it", "values-zh-rCN",
       "apples", "zero", "", "", "",
@@ -166,6 +148,11 @@ class IntegrationTest {
       main(converter, inputPath, outputPath)
     }
   }
+
+  private val Sheet.stringValues: List<String>
+    get() = rowIterator().asSequence()
+      .flatMap { it.cellIterator().asSequence() }
+      .map { it.stringValue }.toList()
 
   @OptIn(ExperimentalPathApi::class)
   private fun Path.copyToRecursively(target: Path) {
