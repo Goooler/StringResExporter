@@ -59,11 +59,11 @@ class IntegrationTest {
     val workbook = WorkbookFactory.create(exportedXls.inputStream())
     validateStringResSheet(workbook.getSheet(StringRes.TAG))
     validatePluralsResSheet(workbook.getSheet(PluralsRes.TAG))
+    validateArrayResSheet(workbook.getSheet(ArrayRes.TAG))
   }
 
   private fun validateStringResSheet(sheet: Sheet) {
-    val sheetContent = sheet.stringValues
-    val expectedContent = arrayOf(
+    val expected = arrayOf(
       "key", "values", "values-it", "values-zh-rCN",
       "first", "first", "primo", "",
       "second", "second", "", "第二",
@@ -71,12 +71,11 @@ class IntegrationTest {
       "forth", "forth", "quarto", "",
       "fifth", "fifth", "", "第五",
     )
-    assertThat(sheetContent).containsExactly(*expectedContent)
+    assertThat(sheet.stringValues).containsExactly(*expected)
   }
 
   private fun validatePluralsResSheet(sheet: Sheet) {
-    val sheetContent = sheet.stringValues
-    val expectedContent = arrayOf(
+    val expected = arrayOf(
       "key", "quantity", "values", "values-it", "values-zh-rCN",
       "apples", "zero", "", "", "",
       "", "one", "apple", "mela", "",
@@ -91,7 +90,21 @@ class IntegrationTest {
       "", "many", "", "", "",
       "", "other", "bananas", "", "香蕉",
     )
-    assertThat(sheetContent).containsExactly(*expectedContent)
+    assertThat(sheet.stringValues).containsExactly(*expected)
+  }
+
+  private fun validateArrayResSheet(sheet: Sheet) {
+    val expected = arrayOf(
+      "key", "values", "values-it", "values-zh-rCN",
+      "colors", "red", "rosso", "",
+      "", "green", "verde", "",
+      "", "blue", "blu", "",
+      "animals", "cat", "", "猫",
+      "", "dog", "", "狗",
+      "", "bird", "", "",
+      "", "fish", "", "",
+    )
+    assertThat(sheet.stringValues).containsExactly(*expected)
   }
 
   private fun validateResContent(importedRes: Path, exportedRes: Path) {
