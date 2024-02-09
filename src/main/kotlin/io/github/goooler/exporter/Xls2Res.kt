@@ -22,6 +22,7 @@ fun xls2res(inputPath: String, outputPath: String) {
   }
   writeStrings(workbook, outputPath)
   writePlurals(workbook, outputPath)
+  writeArray(workbook, outputPath)
   println("$SUCCESS_OUTPUT $outputPath")
 }
 
@@ -119,6 +120,51 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
   }
 }
 
+internal fun writeArray(workbook: Workbook, outputPath: String) {
+  val arraySheet = workbook.getSheet(ArrayRes.TAG) ?: run {
+    logger.info("Sheet ${ArrayRes.TAG} not found.")
+    return
+  }
+  val arrayResMap = mutableMapOf<String, MutableList<ArrayRes>>()
+
+  arraySheet.rowIterator().asSequence().drop(1).forEach { row ->
+    if (row.isEmpty()) return@forEach
+    val key = row.getCell(0).stringValue
+    row.cellIterator().asSequence().drop(1).forEachIndexed { index, cell ->
+      val folderName = arraySheet.getRow(0).getCell(index + 1).stringValue
+      val value = cell.stringValue
+      val arrayList = arrayResMap.getOrPut(folderName) {
+        mutableListOf()
+      }
+      if (key.isEmpty()) {
+        arrayList.last().values.mutate() += value
+      } else {
+        arrayList.add(ArrayRes(key, mutableListOf(value)))
+      }
+    }
+  }
+
+  arrayResMap.forEach { (folderName, arrayResList) ->
+    val rootElement = Element("resources")
+    arrayResList.forEach { arrayRes ->
+      val arrayElement = Element("array").apply {
+        setAttribute("name", arrayRes.name)
+        val elements = arrayRes.values.map {
+          Element("item").apply { text = it }
+        }
+        addContent(elements)
+      }
+      rootElement.addContent(arrayElement)
+    }
+
+    val document = Document(rootElement)
+    val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
+    val outputFile = File(outputPath, "$folderName/arrays.xml")
+    outputFile.parentFile.mkdirs()
+    xmlOutputter.output(document, outputFile.outputStream())
+  }
+}
+
 internal val Cell.stringValue: String
   get() {
     val original = try {
@@ -133,3 +179,6 @@ internal const val NBSP = '\u00A0'
 internal const val SPACE = '\u0020'
 
 private fun Row.isEmpty(): Boolean = all { it.stringCellValue.trim().isEmpty() }
+
+private fun <T : Any> List<T>.mutate(): MutableList<T> = this as? MutableList<T>
+  ?: error("List $this is not mutable.")
