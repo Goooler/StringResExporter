@@ -17,6 +17,8 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.jdom2.Element
+import org.jdom2.input.SAXBuilder
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.params.ParameterizedTest
@@ -153,8 +155,13 @@ class IntegrationTest {
   }
 
   private fun parseRes(resFolder: Path, resFile: String): Sequence<TranslatableRes> {
-    return parseTransRes(resFolder.absolutePathString(), resFile)
-      .flatMap { it.second }
+    return resFolder.listDirectoryEntries().asSequence()
+      .sorted()
+      .flatMap { subFolder ->
+        SAXBuilder().build(subFolder.resolve(resFile).inputStream()).rootElement.children.asSequence()
+          .map(Element::toTransResOrNull)
+          .filterNotNull()
+      }
   }
 
   private fun convert(useCli: Boolean, converter: String, inputPath: String, outputPath: String) {

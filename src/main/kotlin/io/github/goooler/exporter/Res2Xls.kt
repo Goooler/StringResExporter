@@ -5,12 +5,12 @@ import io.github.goooler.exporter.PluralsRes.Companion.map
 import io.github.goooler.exporter.StringRes.Companion.map
 import java.io.File
 import java.io.FileOutputStream
-import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
-import kotlin.io.path.useDirectoryEntries
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
@@ -36,25 +36,35 @@ fun res2xls(inputPath: String, outputPath: String) {
   val pluralsColumns = mutableListOf<ResColumn<PluralsRes>>()
   val arrayColumns = mutableListOf<ResColumn<ArrayRes>>()
 
-  parseTransRes(inputPath).forEachIndexed { index, (folderName, resSequence) ->
-    val (first, second, third) = if (index == 0) {
-      fillNewColumn(true, resSequence, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
-    } else {
-      val newStringColumn = defaultStringColumn.mapValues { it.value.map() }.toMutableMap()
-      val newPluralsColumn = defaultPluralsColumn.mapValues { it.value.map() }.toMutableMap()
-      val newArrayColumn = defaultArrayColumn.mapValues { it.value.map() }.toMutableMap()
-      fillNewColumn(false, resSequence, newStringColumn, newPluralsColumn, newArrayColumn)
+  Paths.get(inputPath).listDirectoryEntries("values*").asSequence()
+    .sorted()
+    .map {
+      it.resolve("strings.xml")
     }
-    stringColumns += first
-    pluralsColumns += second
-    arrayColumns += third
-    // key, value, value-zh-rCN...
-    stringSheet.first().createCell(index + 1).setCellValue(folderName)
-    // key, quantity, value, value-zh-rCN...
-    pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
-    // key, value, value-zh-rCN...
-    arraySheet.first().createCell(index + 1).setCellValue(folderName)
-  }
+    .filter {
+      it.isRegularFile() && it.exists()
+    }
+    .forEachIndexed { index, path ->
+      val elements = SAXBuilder().build(path.inputStream()).rootElement.children
+      val folderName = path.parent.name
+      val (first, second, third) = if (folderName == "values") {
+        fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
+      } else {
+        val newStringColumn = defaultStringColumn.mapValues { it.value.map() }.toMutableMap()
+        val newPluralsColumn = defaultPluralsColumn.mapValues { it.value.map() }.toMutableMap()
+        val newArrayColumn = defaultArrayColumn.mapValues { it.value.map() }.toMutableMap()
+        fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
+      }
+      stringColumns += first
+      pluralsColumns += second
+      arrayColumns += third
+      // key, value, value-zh-rCN...
+      stringSheet.first().createCell(index + 1).setCellValue(folderName)
+      // key, quantity, value, value-zh-rCN...
+      pluralsSheet.first().createCell(index + 2).setCellValue(folderName)
+      // key, value, value-zh-rCN...
+      arraySheet.first().createCell(index + 1).setCellValue(folderName)
+    }
 
   stringColumns.forEachIndexed { columnIndex, column ->
     column.values.forEachIndexed { rowIndex, stringRes ->
@@ -157,46 +167,30 @@ internal fun Element.toArrayResOrNull(): ArrayRes? {
   return ArrayRes(key, items)
 }
 
-internal fun parseTransRes(
-  resRoot: String,
-  resName: String = "strings.xml",
-): Sequence<Pair<String, Sequence<TranslatableRes>>> {
-  return Paths.get(resRoot).useDirectoryEntries("values*") { path ->
-    path.sorted()
-      .filter(Path::exists)
-      .map {
-        val folderName = it.name
-        folderName to SAXBuilder().build(it.resolve(resName).inputStream())
-          .rootElement.children.asSequence()
-          .map { e ->
-            e.toStringResOrNull() ?: e.toPluralsResOrNull() ?: e.toArrayResOrNull()
-          }
-          .filterNotNull()
-      }
-  }
+internal fun Element.toTransResOrNull(): TranslatableRes? {
+  return toStringResOrNull() ?: toPluralsResOrNull() ?: toArrayResOrNull()
 }
 
 private fun fillNewColumn(
   fillDefault: Boolean,
-  resSequence: Sequence<TranslatableRes>,
+  elements: List<Element>,
   stringColumn: ResColumn<StringRes>,
   pluralsColumn: ResColumn<PluralsRes>,
   arrayColumn: ResColumn<ArrayRes>,
 ): Triple<ResColumn<StringRes>, ResColumn<PluralsRes>, ResColumn<ArrayRes>> {
-  resSequence.forEach { res ->
+  elements.forEach { element ->
+    val res = element.toTransResOrNull() ?: return@forEach
     when (res) {
       is StringRes -> {
         if (fillDefault || stringColumn.containsKey(res.name)) {
           stringColumn[res.name] = res
         }
       }
-
       is PluralsRes -> {
         if (fillDefault || pluralsColumn.containsKey(res.name)) {
           pluralsColumn[res.name] = res
         }
       }
-
       is ArrayRes -> {
         if (fillDefault || arrayColumn.containsKey(res.name)) {
           val standard = arrayColumn[res.name]?.values
