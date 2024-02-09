@@ -9,4 +9,11 @@
     <item quantity="other">香蕉</item>
   </plurals>
 
+  <!--Arrays-->
+
+  <string-array name="animals">
+    <item>猫</item>
+    <item>狗</item>
+  </string-array>
+
 </resources>

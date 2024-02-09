@@ -17,6 +17,7 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -59,20 +60,11 @@ class IntegrationTest {
     val workbook = WorkbookFactory.create(exportedXls.inputStream())
     validateStringResSheet(workbook.getSheet(StringRes.TAG))
     validatePluralsResSheet(workbook.getSheet(PluralsRes.TAG))
+    validateArrayResSheet(workbook.getSheet(ArrayRes.TAG))
   }
 
   private fun validateStringResSheet(sheet: Sheet) {
-    val sheetContent = sheet.asSequence()
-      .flatMap {
-        buildList {
-          for (i in 0 until it.lastCellNum) {
-            add(it.getCell(i))
-          }
-        }
-      }.map {
-        it.stringCellValue.orEmpty()
-      }.toList()
-    val expectedContent = arrayOf(
+    val expected = arrayOf(
       "key", "values", "values-it", "values-zh-rCN",
       "first", "first", "primo", "",
       "second", "second", "", "第二",
@@ -80,21 +72,11 @@ class IntegrationTest {
       "forth", "forth", "quarto", "",
       "fifth", "fifth", "", "第五",
     )
-    assertThat(sheetContent).containsExactly(*expectedContent)
+    assertThat(sheet.stringValues).containsExactly(*expected)
   }
 
   private fun validatePluralsResSheet(sheet: Sheet) {
-    val sheetContent = sheet.asSequence()
-      .flatMap {
-        buildList {
-          for (i in 0 until it.lastCellNum) {
-            add(it.getCell(i))
-          }
-        }
-      }.map {
-        it.stringCellValue.orEmpty()
-      }.toList()
-    val expectedContent = arrayOf(
+    val expected = arrayOf(
       "key", "quantity", "values", "values-it", "values-zh-rCN",
       "apples", "zero", "", "", "",
       "", "one", "apple", "mela", "",
@@ -109,16 +91,31 @@ class IntegrationTest {
       "", "many", "", "", "",
       "", "other", "bananas", "", "香蕉",
     )
-    assertThat(sheetContent).containsExactly(*expectedContent)
+    assertThat(sheet.stringValues).containsExactly(*expected)
+  }
+
+  private fun validateArrayResSheet(sheet: Sheet) {
+    val expected = arrayOf(
+      "key", "values", "values-it", "values-zh-rCN",
+      "colors", "red", "rosso", "",
+      "", "green", "verde", "",
+      "", "blue", "blu", "",
+      "animals", "cat", "", "猫",
+      "", "dog", "", "狗",
+      "", "bird", "", "",
+      "", "fish", "", "",
+    )
+    assertThat(sheet.stringValues).containsExactly(*expected)
   }
 
   private fun validateResContent(importedRes: Path, exportedRes: Path) {
     validateStringResContent(importedRes, exportedRes)
     validatePluralsResContent(importedRes, exportedRes)
+    validateArrayResContent(importedRes, exportedRes)
   }
 
   private fun validateStringResContent(importedRes: Path, exportedRes: Path) {
-    fun List<TranslatableRes>.convert() = asSequence()
+    fun Sequence<TranslatableRes>.convert() = asSequence()
       .filterIsInstance<StringRes>()
       .filter {
         it.value.isNotEmpty()
@@ -133,7 +130,7 @@ class IntegrationTest {
   }
 
   private fun validatePluralsResContent(importedRes: Path, exportedRes: Path) {
-    fun List<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
+    fun Sequence<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
 
     val expected = parseRes(importedRes, "strings.xml").convert()
     val actual = parseRes(exportedRes, "plurals.xml").convert().toTypedArray()
@@ -143,20 +140,27 @@ class IntegrationTest {
     assertThat(expected).containsExactly(*actual)
   }
 
-  private fun parseRes(resFolder: Path, resFile: String): List<TranslatableRes> {
-    val parsed = mutableListOf<TranslatableRes>()
-    resFolder.listDirectoryEntries().asSequence()
-      .sorted()
-      .forEach { subFolder ->
-        parsed += SAXBuilder().build(
-          subFolder.resolve(resFile).inputStream(),
-        ).rootElement.children.asSequence()
-          .map {
-            it.toStringResOrNull() ?: it.toPluralsResOrNull()
-          }
+  private fun validateArrayResContent(importedRes: Path, exportedRes: Path) {
+    fun Sequence<TranslatableRes>.convert() = filterIsInstance<ArrayRes>().toList()
+
+    val expected = parseRes(importedRes, "strings.xml").convert()
+    val actual = parseRes(exportedRes, "arrays.xml").convert()
+
+    assertThat(expected.isNotEmpty()).isEqualTo(true)
+    assertThat(actual.isNotEmpty()).isEqualTo(true)
+    assertThat(expected.map(ArrayRes::name))
+      .containsExactly(*actual.map(ArrayRes::name).toTypedArray())
+    assertThat(expected.flatMap(ArrayRes::values))
+      .containsAtLeast(*actual.flatMap(ArrayRes::values).toTypedArray())
+  }
+
+  private fun parseRes(resRoot: Path, resFile: String): Sequence<TranslatableRes> {
+    return parseResFiles(resRoot.absolutePathString(), resFile)
+      .flatMap { subFolder ->
+        SAXBuilder().build(subFolder.inputStream()).rootElement.children.asSequence()
+          .map(Element::toTransResOrNull)
           .filterNotNull()
       }
-    return parsed
   }
 
   private fun convert(useCli: Boolean, converter: String, inputPath: String, outputPath: String) {
@@ -166,6 +170,11 @@ class IntegrationTest {
       main(converter, inputPath, outputPath)
     }
   }
+
+  private val Sheet.stringValues: List<String>
+    get() = rowIterator().asSequence()
+      .flatMap { it.cellIterator().asSequence() }
+      .map { it.stringValue }.toList()
 
   @OptIn(ExperimentalPathApi::class)
   private fun Path.copyToRecursively(target: Path) {

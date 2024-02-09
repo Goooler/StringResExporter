@@ -21,4 +21,19 @@
     <item quantity="one">banana</item>
   </plurals>
 
+  <!--Arrays-->
+
+  <array name="colors">
+    <item>red</item>
+    <item>green</item>
+    <item>blue</item>
+  </array>
+
+  <string-array name="animals">
+    <item>cat</item>
+    <item>dog</item>
+    <item>bird</item>
+    <item>fish</item>
+  </string-array>
+
 </resources>

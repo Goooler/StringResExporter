@@ -12,6 +12,10 @@ data class StringRes(
 ) : TranslatableRes() {
   companion object {
     val TAG: String = StringRes::class.java.simpleName
+
+    fun StringRes.map(): StringRes {
+      return copy(value = "")
+    }
   }
 }
 
@@ -20,8 +24,7 @@ data class PluralsRes(
   val values: MutableMap<String, String> = DEFAULT_VALUES.toMutableMap(),
 ) : TranslatableRes() {
   companion object {
-    val TAG: String = PluralsRes::class.java.simpleName
-    val DEFAULT_VALUES = mapOf(
+    private val DEFAULT_VALUES = mapOf(
       "zero" to "",
       "one" to "",
       "two" to "",
@@ -29,5 +32,24 @@ data class PluralsRes(
       "many" to "",
       "other" to "",
     )
+    val TAG: String = PluralsRes::class.java.simpleName
+
+    fun PluralsRes.map(): PluralsRes {
+      return copy(values = DEFAULT_VALUES.toMutableMap())
+    }
+  }
+}
+
+data class ArrayRes(
+  override val name: String,
+  val values: List<String>,
+) : TranslatableRes() {
+  companion object {
+    val TAG: String = ArrayRes::class.java.simpleName
+
+    fun ArrayRes.map(): ArrayRes {
+      val emptyValues = List(values.size) { "" }
+      return copy(values = emptyValues)
+    }
   }
 }
