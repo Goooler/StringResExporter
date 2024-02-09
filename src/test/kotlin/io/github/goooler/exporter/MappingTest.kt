@@ -36,6 +36,16 @@ class MappingTest {
   }
 
   @Test
+  fun parseArray() {
+    val inputStream = requireResourceAsStream("/res/values-it/strings.xml")
+    val arrayResList = SAXBuilder().build(inputStream).rootElement.children.mapNotNull {
+      it.toArrayResOrNull()
+    }
+    val arrayRes = arrayResList.single()
+    assertThat(arrayRes.toString()).isEqualTo("ArrayRes(name=colors, values=[rosso, verde, blu, giallo])")
+  }
+
+  @Test
   fun parseCellString() {
     val row = HSSFWorkbook().createSheet("test").createRow(0)
     row.createCell(0).setCellValue(" Hello${NBSP}World ")
