@@ -94,19 +94,16 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
     val rootElement = Element("resources")
     pluralsResList.forEach res@{ pluralsRes ->
       val pluralsElement = Element("plurals").apply {
-        var emptyItemCount = 0
-        pluralsRes.values.forEach item@{ (quantity, value) ->
-          if (value.isEmpty()) {
-            emptyItemCount++
-            return@item
+        val elements = pluralsRes.values.asSequence()
+          .filter { it.value.isNotEmpty() }
+          .map {
+            Element("item").apply {
+              setAttribute("quantity", it.key)
+              text = it.value
+            }
           }
-          val itemElement = Element("item").apply {
-            setAttribute("quantity", quantity)
-            text = value
-          }
-          addContent(itemElement)
-        }
-        if (emptyItemCount == 6) return@res
+          .toList()
+        if (elements.isEmpty()) return@res
         setAttribute("name", pluralsRes.name)
       }
       rootElement.addContent(pluralsElement)
