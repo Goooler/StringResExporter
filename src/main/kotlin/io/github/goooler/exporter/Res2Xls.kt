@@ -1,5 +1,8 @@
 package io.github.goooler.exporter
 
+import io.github.goooler.exporter.ArrayRes.Companion.map
+import io.github.goooler.exporter.PluralsRes.Companion.map
+import io.github.goooler.exporter.StringRes.Companion.map
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
@@ -47,9 +50,9 @@ fun res2xls(inputPath: String, outputPath: String) {
       val (first, second, third) = if (folderName == "values") {
         fillNewColumn(true, elements, defaultStringColumn, defaultPluralsColumn, defaultArrayColumn)
       } else {
-        val newStringColumn = defaultStringColumn.mapValues { it.value.copy() }.toMutableMap()
-        val newPluralsColumn = defaultPluralsColumn.mapValues { it.value.copy() }.toMutableMap()
-        val newArrayColumn = defaultArrayColumn.mapValues { it.value.copy() }.toMutableMap()
+        val newStringColumn = defaultStringColumn.mapValues { it.value.map() }.toMutableMap()
+        val newPluralsColumn = defaultPluralsColumn.mapValues { it.value.map() }.toMutableMap()
+        val newArrayColumn = defaultArrayColumn.mapValues { it.value.map() }.toMutableMap()
         fillNewColumn(false, elements, newStringColumn, newPluralsColumn, newArrayColumn)
       }
       stringColumns += first
