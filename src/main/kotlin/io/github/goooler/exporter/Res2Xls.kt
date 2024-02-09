@@ -172,7 +172,10 @@ private fun fillNewColumn(
   arrayColumn: ResColumn<ArrayRes>,
 ): Triple<ResColumn<StringRes>, ResColumn<PluralsRes>, ResColumn<ArrayRes>> {
   elements.forEach { element ->
-    val res = element.toStringResOrNull() ?: element.toPluralsResOrNull() ?: element.toArrayResOrNull()
+    val res = element.toStringResOrNull()
+      ?: element.toPluralsResOrNull()
+      ?: element.toArrayResOrNull()
+      ?: return@forEach
     when (res) {
       is StringRes -> {
         if (fillDefault || stringColumn.containsKey(res.name)) {
@@ -195,7 +198,6 @@ private fun fillNewColumn(
           arrayColumn[res.name] = res.copy(values = filled)
         }
       }
-      null -> Unit
     }
   }
   return Triple(stringColumn, pluralsColumn, arrayColumn)
