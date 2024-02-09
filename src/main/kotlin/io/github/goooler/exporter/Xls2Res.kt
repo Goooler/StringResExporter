@@ -147,7 +147,7 @@ internal fun writeArray(workbook: Workbook, outputPath: String) {
   arrayResMap.forEach { (folderName, arrayResList) ->
     val rootElement = Element("resources")
     arrayResList.forEach res@{ arrayRes ->
-      val arrayElement = Element("array").apply {
+      val arrayElement = Element("string-array").apply {
         val elements = arrayRes.values.asSequence()
           .filter { it.isNotEmpty() }
           .map { Element("item").apply { text = it } }
