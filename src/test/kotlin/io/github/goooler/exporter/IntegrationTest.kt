@@ -110,6 +110,7 @@ class IntegrationTest {
   private fun validateResContent(importedRes: Path, exportedRes: Path) {
     validateStringResContent(importedRes, exportedRes)
     validatePluralsResContent(importedRes, exportedRes)
+    validateArrayResContent(importedRes, exportedRes)
   }
 
   private fun validateStringResContent(importedRes: Path, exportedRes: Path) {
@@ -138,6 +139,20 @@ class IntegrationTest {
     assertThat(expected).containsExactly(*actual)
   }
 
+  private fun validateArrayResContent(importedRes: Path, exportedRes: Path) {
+    fun List<TranslatableRes>.convert() = filterIsInstance<ArrayRes>().toList()
+
+    val expected = parseRes(importedRes, "strings.xml").convert()
+    val actual = parseRes(exportedRes, "arrays.xml").convert()
+
+    assertThat(expected.isNotEmpty()).isEqualTo(true)
+    assertThat(actual.isNotEmpty()).isEqualTo(true)
+    assertThat(expected.map(ArrayRes::name))
+      .containsExactly(*actual.map(ArrayRes::name).toTypedArray())
+    assertThat(expected.flatMap(ArrayRes::values))
+      .containsAtLeast(*actual.flatMap(ArrayRes::values).toTypedArray())
+  }
+
   private fun parseRes(resFolder: Path, resFile: String): List<TranslatableRes> {
     val parsed = mutableListOf<TranslatableRes>()
     resFolder.listDirectoryEntries().asSequence()
@@ -146,9 +161,7 @@ class IntegrationTest {
         parsed += SAXBuilder().build(
           subFolder.resolve(resFile).inputStream(),
         ).rootElement.children.asSequence()
-          .map {
-            it.toStringResOrNull() ?: it.toPluralsResOrNull()
-          }
+          .map { it.toStringResOrNull() ?: it.toPluralsResOrNull() ?: it.toArrayResOrNull() }
           .filterNotNull()
       }
     return parsed
