@@ -167,6 +167,10 @@ internal fun Element.toArrayResOrNull(): ArrayRes? {
   return ArrayRes(key, items)
 }
 
+internal fun Element.toTransResOrNull(): TranslatableRes? {
+  return toStringResOrNull() ?: toPluralsResOrNull() ?: toArrayResOrNull()
+}
+
 private fun fillNewColumn(
   fillDefault: Boolean,
   elements: List<Element>,
@@ -175,10 +179,7 @@ private fun fillNewColumn(
   arrayColumn: ResColumn<ArrayRes>,
 ): Triple<ResColumn<StringRes>, ResColumn<PluralsRes>, ResColumn<ArrayRes>> {
   elements.forEach { element ->
-    val res = element.toStringResOrNull()
-      ?: element.toPluralsResOrNull()
-      ?: element.toArrayResOrNull()
-      ?: return@forEach
+    val res = element.toTransResOrNull() ?: return@forEach
     when (res) {
       is StringRes -> {
         if (fillDefault || stringColumn.containsKey(res.name)) {

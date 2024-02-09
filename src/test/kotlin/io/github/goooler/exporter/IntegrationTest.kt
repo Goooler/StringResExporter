@@ -17,6 +17,7 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -158,7 +159,7 @@ class IntegrationTest {
       .sorted()
       .flatMap { subFolder ->
         SAXBuilder().build(subFolder.resolve(resFile).inputStream()).rootElement.children.asSequence()
-          .map { it.toStringResOrNull() ?: it.toPluralsResOrNull() ?: it.toArrayResOrNull() }
+          .map(Element::toTransResOrNull)
           .filterNotNull()
       }
   }
