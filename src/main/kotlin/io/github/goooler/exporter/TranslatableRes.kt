@@ -48,8 +48,8 @@ data class ArrayRes(
     val TAG: String = ArrayRes::class.java.simpleName
 
     fun ArrayRes.map(): ArrayRes {
-      val emptyContentValues = List(values.size) { "" }
-      return copy(values = emptyContentValues)
+      val emptyValues = List(values.size) { "" }
+      return copy(values = emptyValues)
     }
   }
 }
