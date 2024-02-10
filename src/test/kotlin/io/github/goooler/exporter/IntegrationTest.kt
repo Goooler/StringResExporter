@@ -101,12 +101,10 @@ class IntegrationTest {
 
     assertThat(expected.isNotEmpty()).isEqualTo(true)
     assertThat(actual.isNotEmpty()).isEqualTo(true)
-    ArrayRes::name.let { ref ->
-      assertThat(expected.map(ref)).containsExactly(*actual.map(ref).toTypedArray())
-    }
-    ArrayRes::values.let { ref ->
-      assertThat(expected.flatMap(ref)).containsAtLeast(*actual.flatMap(ref).toTypedArray())
-    }
+    assertThat(expected.map(ArrayRes::name))
+      .containsExactly(*actual.map(ArrayRes::name).toTypedArray())
+    assertThat(expected.flatMap(ArrayRes::values))
+      .containsAtLeast(*actual.flatMap(ArrayRes::values).toTypedArray())
   }
 
   private inline fun <reified T : TranslatableRes> parseRes(resRoot: Path, resFile: String): List<T> {
