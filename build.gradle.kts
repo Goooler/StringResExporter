@@ -38,7 +38,6 @@ val fatJar by tasks.registering(Jar::class) {
     "META-INF/maven/**",
     "META-INF/proguard/**",
     "META-INF/*.version",
-    "META-INF/DEPENDENCIES",
     "**/*.proto",
     "**/*.dex",
     "**/LICENSE**",
@@ -114,7 +113,6 @@ val r8: Configuration by configurations.creating
 dependencies {
   implementation("org.apache.poi:poi:5.2.5")
   implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("org.apache.logging.log4j:log4j-core:2.22.1")
 
   r8("com.android.tools:r8:8.2.42")
 
