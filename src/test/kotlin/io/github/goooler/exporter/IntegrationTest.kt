@@ -15,6 +15,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.readLines
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.Element
@@ -58,54 +59,16 @@ class IntegrationTest {
 
   private fun validateXlsContent(exportedXls: Path) {
     val workbook = WorkbookFactory.create(exportedXls.inputStream())
-    validateStringResSheet(workbook.getSheet(StringRes.TAG))
-    validatePluralsResSheet(workbook.getSheet(PluralsRes.TAG))
-    validateArrayResSheet(workbook.getSheet(ArrayRes.TAG))
-  }
 
-  private fun validateStringResSheet(sheet: Sheet) {
-    val expected = arrayOf(
-      "key", "values", "values-it", "values-zh-rCN",
-      "first", "first", "primo", "",
-      "second", "second", "", "第二",
-      "third", "third", "", "",
-      "forth", "forth", "quarto", "",
-      "fifth", "fifth", "", "第五",
-    )
-    assertThat(sheet.stringValues).containsExactly(*expected)
-  }
-
-  private fun validatePluralsResSheet(sheet: Sheet) {
-    val expected = arrayOf(
-      "key", "quantity", "values", "values-it", "values-zh-rCN",
-      "apples", "zero", "", "", "",
-      "", "one", "apple", "mela", "",
-      "", "two", "", "", "",
-      "", "few", "", "", "",
-      "", "many", "", "mele", "",
-      "", "other", "apples", "mele", "",
-      "bananas", "zero", "", "", "",
-      "", "one", "banana", "", "",
-      "", "two", "", "", "",
-      "", "few", "", "", "",
-      "", "many", "", "", "",
-      "", "other", "bananas", "", "香蕉",
-    )
-    assertThat(sheet.stringValues).containsExactly(*expected)
-  }
-
-  private fun validateArrayResSheet(sheet: Sheet) {
-    val expected = arrayOf(
-      "key", "values", "values-it", "values-zh-rCN",
-      "colors", "red", "rosso", "",
-      "", "green", "verde", "",
-      "", "blue", "blu", "",
-      "animals", "cat", "", "猫",
-      "", "dog", "", "狗",
-      "", "bird", "", "",
-      "", "fish", "", "",
-    )
-    assertThat(sheet.stringValues).containsExactly(*expected)
+    StringRes.TAG.let { tag ->
+      assertThat(workbook.getSheet(tag).stringValues).containsExactly(*readCsvValues(tag))
+    }
+    PluralsRes.TAG.let { tag ->
+      assertThat(workbook.getSheet(tag).stringValues).containsExactly(*readCsvValues(tag))
+    }
+    ArrayRes.TAG.let { tag ->
+      assertThat(workbook.getSheet(tag).stringValues).containsExactly(*readCsvValues(tag))
+    }
   }
 
   private fun validateResContent(importedRes: Path, exportedRes: Path) {
@@ -169,6 +132,11 @@ class IntegrationTest {
     } else {
       main(converter, inputPath, outputPath)
     }
+  }
+
+  private fun readCsvValues(name: String): Array<String> {
+    return Paths.get(requireResource("/sheets/$name.csv").toURI()).readLines().asSequence()
+      .flatMap { it.split(",").asSequence() }.toList().toTypedArray()
   }
 
   private val Sheet.stringValues: List<String>
