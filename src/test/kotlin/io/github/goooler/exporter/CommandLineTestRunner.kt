@@ -24,10 +24,15 @@ class CommandLineTestRunner(
   }
 
   companion object {
+    private val isWindows = System.getProperty("os.name").startsWith("Windows")
     private val cliPath = System.getProperty("CLI_PATH") ?: error("CLI_PATH must not be null.")
 
     private fun cliCommand(vararg arguments: String) = buildList {
-      addAll(listOf("java", "-jar", cliPath))
+      // Binary Jar is not executable on Windows.
+      if (isWindows) {
+        addAll(listOf("java", "-jar"))
+      }
+      add(cliPath)
       addAll(arguments)
     }
   }
