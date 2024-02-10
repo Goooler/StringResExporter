@@ -9,6 +9,7 @@
 
 -dontwarn aQute.bnd.**
 -dontwarn org.osgi.**
+-dontwarn edu.umd.cs.findbugs.annotations.**
 
 # Used by poi.
 -keep,allowoptimization class org.apache.logging.log4j.** { *; }
