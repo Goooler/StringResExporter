@@ -23,7 +23,7 @@ fun xls2res(inputPath: String, outputPath: String) {
   writeStrings(workbook, outputPath)
   writePlurals(workbook, outputPath)
   writeArray(workbook, outputPath)
-  println("$SUCCESS_OUTPUT $outputPath")
+  logger.info("$SUCCESS_OUTPUT $outputPath")
 }
 
 internal fun writeStrings(workbook: Workbook, outputPath: String) {
