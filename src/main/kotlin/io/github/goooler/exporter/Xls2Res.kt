@@ -47,13 +47,16 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
 
   stringResMap.forEach { (folderName, stringResList) ->
     val rootElement = Element("resources")
-    stringResList.forEach { stringRes ->
-      val stringElement = Element("string").apply {
-        setAttribute("name", stringRes.name)
-        text = stringRes.value
+    val elements = stringResList.asSequence()
+      .filter { it.value.isNotEmpty() }
+      .map {
+        Element("string").apply {
+          setAttribute("name", it.name)
+          text = it.value
+        }
       }
-      rootElement.addContent(stringElement)
-    }
+      .toList()
+    rootElement.addContent(elements)
 
     val document = Document(rootElement)
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())

@@ -78,14 +78,8 @@ class IntegrationTest {
   }
 
   private fun validateStringResContent(importedRes: Path, exportedRes: Path) {
-    fun Sequence<TranslatableRes>.convert() = asSequence()
-      .filterIsInstance<StringRes>()
-      .filter {
-        it.value.isNotEmpty()
-      }.toList()
-
-    val expected = parseRes(importedRes, "strings.xml").convert()
-    val actual = parseRes(exportedRes, "strings.xml").convert().toTypedArray()
+    val expected = parseRes<StringRes>(importedRes, "strings.xml")
+    val actual = parseRes<StringRes>(exportedRes, "strings.xml").toTypedArray()
 
     assertThat(expected.isNotEmpty()).isEqualTo(true)
     assertThat(actual.isNotEmpty()).isEqualTo(true)
@@ -93,10 +87,8 @@ class IntegrationTest {
   }
 
   private fun validatePluralsResContent(importedRes: Path, exportedRes: Path) {
-    fun Sequence<TranslatableRes>.convert() = filterIsInstance<PluralsRes>().toList()
-
-    val expected = parseRes(importedRes, "strings.xml").convert()
-    val actual = parseRes(exportedRes, "plurals.xml").convert().toTypedArray()
+    val expected = parseRes<PluralsRes>(importedRes, "strings.xml")
+    val actual = parseRes<PluralsRes>(exportedRes, "plurals.xml").toTypedArray()
 
     assertThat(expected.isNotEmpty()).isEqualTo(true)
     assertThat(actual.isNotEmpty()).isEqualTo(true)
@@ -104,10 +96,8 @@ class IntegrationTest {
   }
 
   private fun validateArrayResContent(importedRes: Path, exportedRes: Path) {
-    fun Sequence<TranslatableRes>.convert() = filterIsInstance<ArrayRes>().toList()
-
-    val expected = parseRes(importedRes, "strings.xml").convert()
-    val actual = parseRes(exportedRes, "arrays.xml").convert()
+    val expected = parseRes<ArrayRes>(importedRes, "strings.xml")
+    val actual = parseRes<ArrayRes>(exportedRes, "arrays.xml")
 
     assertThat(expected.isNotEmpty()).isEqualTo(true)
     assertThat(actual.isNotEmpty()).isEqualTo(true)
@@ -117,13 +107,14 @@ class IntegrationTest {
       .containsAtLeast(*actual.flatMap(ArrayRes::values).toTypedArray())
   }
 
-  private fun parseRes(resRoot: Path, resFile: String): Sequence<TranslatableRes> {
+  private inline fun <reified T : TranslatableRes> parseRes(resRoot: Path, resFile: String): List<T> {
     return parseResFiles(resRoot.absolutePathString(), resFile)
       .flatMap { subFolder ->
         SAXBuilder().build(subFolder.inputStream()).rootElement.children.asSequence()
           .map(Element::toTransResOrNull)
-          .filterNotNull()
+          .filterIsInstance<T>()
       }
+      .toList()
   }
 
   private fun convert(useCli: Boolean, converter: String, inputPath: String, outputPath: String) {
