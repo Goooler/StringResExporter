@@ -17,7 +17,7 @@ In the usages below, [`./src/test/resources/res`](src/test/resources/res) will b
 which contains three sheets: [`StringRes`](src/test/resources/sheets/StringRes.csv),
 [`PluralsRes`](src/test/resources/sheets/PluralsRes.csv) and [`ArrayRes`](src/test/resources/sheets/ArrayRes.csv).
 If you want to import resources from a XLS file, you must use the same formatted sheets,
-including the same sheet names and row names
+including the same sheet names and column names
 
 ## Install
 
