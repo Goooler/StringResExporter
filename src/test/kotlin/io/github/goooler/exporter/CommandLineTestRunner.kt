@@ -27,7 +27,7 @@ class CommandLineTestRunner(
     private val cliPath = System.getProperty("CLI_PATH") ?: error("CLI_PATH must not be null.")
 
     private fun cliCommand(vararg arguments: String) = buildList {
-      addAll(listOf("java", "-Dlog4j2.loggerContextFactory=org.apache.logging.log4j.simple.SimpleLoggerContextFactory", "-jar", cliPath))
+      addAll(listOf("java", "-jar", cliPath))
       addAll(arguments)
     }
   }
