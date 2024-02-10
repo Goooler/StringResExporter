@@ -11,4 +11,4 @@
 -dontwarn org.osgi.**
 
 # Used by poi.
--keep,allowoptimization,allowshrinking class org.apache.logging.log4j.** { *; }
+-keep,allowoptimization class org.apache.logging.log4j.** { *; }
