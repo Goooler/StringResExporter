@@ -13,6 +13,12 @@ string-res-exporter --res2xls /path/to/res /path/to/xls
 string-res-exporter --xls2res /path/to/output.xls /path/to/res
 ```
 
+In the usages below, [`./src/test/resources/res`](src/test/resources/res) will be exported to `/path/to/xls/output.xls`,
+which contains three sheets: [`StringRes`](src/test/resources/sheets/StringRes.csv),
+[`PluralsRes`](src/test/resources/sheets/PluralsRes.csv) and [`ArrayRes`](src/test/resources/sheets/ArrayRes.csv).
+If you want to import resources from a XLS file, you must use the same formatted sheets,
+including the same sheet names and row names
+
 ## Install
 
 **Mac OS** or **Linux**
