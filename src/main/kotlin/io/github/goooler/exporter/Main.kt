@@ -12,6 +12,6 @@ fun main(vararg args: String) {
   }
 }
 
-val logger: Logger = LogManager.getLogger("Main")
+val logger: Logger = LogManager.getLogger(::main::class.java)
 
 const val SUCCESS_OUTPUT = "Convert finished, output path:"
