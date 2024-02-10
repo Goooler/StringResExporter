@@ -25,8 +25,7 @@ val fatJar by tasks.registering(Jar::class) {
   dependsOn(configurations.runtimeClasspath)
   dependsOn(tasks.jar)
 
-  from(sourceSets.main.map { it.output.classesDirs })
-  from(sourceSets.main.map { it.output.resourcesDir })
+  from(sourceSets.main.map { it.output.classesDirs + it.output.resourcesDir })
   from(configurations.runtimeClasspath.map { it.asFileTree.files.map(::zipTree) })
 
   archiveClassifier = "fat"
