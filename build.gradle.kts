@@ -84,7 +84,9 @@ val binaryJar by tasks.registering(Task::class) {
 
     binaryFile.parentFile.mkdirs()
     binaryFile.delete()
-    binaryFile.writeText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
+    // To get rid of extra log4j2 dependencies, see https://poi.apache.org/components/logging.html.
+    val flagSimpleLogger = "-Dlog4j2.loggerContextFactory=org.apache.logging.log4j.simple.SimpleLoggerContextFactory"
+    binaryFile.writeText("#!/bin/sh\n\nexec java $flagSimpleLogger \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
     r8File.inputStream().use { binaryFile.appendBytes(it.readBytes()) }
 
     binaryFile.setExecutable(true, false)
