@@ -78,11 +78,7 @@ class IntegrationTest {
   }
 
   private fun validateStringResContent(importedRes: Path, exportedRes: Path) {
-    fun Sequence<TranslatableRes>.convert() = asSequence()
-      .filterIsInstance<StringRes>()
-      .filter {
-        it.value.isNotEmpty()
-      }.toList()
+    fun Sequence<TranslatableRes>.convert() = filterIsInstance<StringRes>().toList()
 
     val expected = parseRes(importedRes, "strings.xml").convert()
     val actual = parseRes(exportedRes, "strings.xml").convert().toTypedArray()
