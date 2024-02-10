@@ -9,4 +9,4 @@ fun main(vararg args: String) {
   }
 }
 
-const val SUCCESS_OUTPUT = "Convert finished, output path:"
+internal const val SUCCESS_OUTPUT = "Convert finished, output path:"

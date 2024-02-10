@@ -18,7 +18,7 @@ class CommandLineTestRunner(
     if (exitCode != 0 || err.isNotEmpty()) {
       error("Error occurred when running command line: $err")
     }
-    if (!out.contains(SUCCESS_OUTPUT)) {
+    if (!out.startsWith(SUCCESS_OUTPUT)) {
       error("Output is not correct: $out")
     }
   }
