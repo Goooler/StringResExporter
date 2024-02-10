@@ -15,10 +15,10 @@ class CommandLineTestRunner(
     val err = process.errorStream.readBytes().toString(StandardCharsets.UTF_8)
     val out = process.inputStream.readBytes().toString(StandardCharsets.UTF_8)
 
-    if (exitCode != 0 && err.isNotEmpty()) {
+    if (exitCode != 0 || err.isNotEmpty()) {
       runningError("Error occurred when running command line: $err")
     }
-    if (!out.startsWith(SUCCESS_OUTPUT)) {
+    if (!out.contains(SUCCESS_OUTPUT)) {
       runningError("Output is not correct: $out")
     }
   }
@@ -27,7 +27,7 @@ class CommandLineTestRunner(
     throw CommandLineException(message)
   }
 
-  class CommandLineException(message: String) : RuntimeException(message)
+  private class CommandLineException(message: String) : IllegalStateException(message)
 
   companion object {
     private val cliPath = System.getProperty("CLI_PATH") ?: error("CLI_PATH must not be null.")
