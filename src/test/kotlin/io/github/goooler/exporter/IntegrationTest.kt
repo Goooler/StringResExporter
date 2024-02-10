@@ -60,12 +60,15 @@ class IntegrationTest {
   private fun validateXlsContent(exportedXls: Path) {
     val workbook = WorkbookFactory.create(exportedXls.inputStream())
 
-    assertThat(workbook.getSheet(StringRes.TAG).stringValues)
-      .containsExactly(*readCsvValues(StringRes.TAG))
-    assertThat(workbook.getSheet(PluralsRes.TAG).stringValues)
-      .containsExactly(*readCsvValues(PluralsRes.TAG))
-    assertThat(workbook.getSheet(ArrayRes.TAG).stringValues)
-      .containsExactly(*readCsvValues(ArrayRes.TAG))
+    StringRes.TAG.let { tag ->
+      assertThat(workbook.getSheet(tag).stringValues).containsExactly(*readCsvValues(tag))
+    }
+    PluralsRes.TAG.let { tag ->
+      assertThat(workbook.getSheet(tag).stringValues).containsExactly(*readCsvValues(tag))
+    }
+    ArrayRes.TAG.let { tag ->
+      assertThat(workbook.getSheet(tag).stringValues).containsExactly(*readCsvValues(tag))
+    }
   }
 
   private fun validateResContent(importedRes: Path, exportedRes: Path) {
@@ -131,8 +134,8 @@ class IntegrationTest {
     }
   }
 
-  private fun readCsvValues(fileName: String): Array<String> {
-    return Paths.get(requireResource("/sheets/$fileName.csv").toURI()).readLines().asSequence()
+  private fun readCsvValues(name: String): Array<String> {
+    return Paths.get(requireResource("/sheets/$name.csv").toURI()).readLines().asSequence()
       .flatMap { it.split(",").asSequence() }.toList().toTypedArray()
   }
 
