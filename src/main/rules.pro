@@ -15,4 +15,4 @@
 -dontwarn edu.umd.cs.findbugs.annotations.**
 
 # Used by poi.
--keep,allowoptimization class org.apache.logging.log4j.** { *; }
+-keep,allowoptimization,allowshrinking class org.apache.logging.log4j.** { *; }
