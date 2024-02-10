@@ -85,7 +85,7 @@ val binaryJar by tasks.registering(Task::class) {
     binaryFile.parentFile.mkdirs()
     binaryFile.delete()
     binaryFile.writeText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
-    r8File.inputStream().use { binaryFile.appendBytes(it.readBytes()) }
+    binaryFile.appendBytes(r8File.readBytes())
 
     binaryFile.setExecutable(true, false)
   }
