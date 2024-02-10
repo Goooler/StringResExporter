@@ -72,9 +72,9 @@ val r8Jar by tasks.registering(JavaExec::class) {
 
 val binaryFile = layout.buildDirectory.file("libs/$baseName-$version-binary.jar").map { it.asFile }
 val binaryJar by tasks.registering(Task::class) {
-  dependsOn(fatJar)
+  dependsOn(r8Jar)
 
-  val r8FileProvider = fatJar.get().archiveFile
+  val r8FileProvider = layout.file(r8File)
   val binaryFileProvider = layout.file(binaryFile)
   inputs.files(r8FileProvider)
   outputs.file(binaryFileProvider)
