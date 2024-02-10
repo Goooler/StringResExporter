@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
   <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
+    <Console name="Default" target="SYSTEM_OUT">
+      <PatternLayout pattern="%-5level %logger{36} - %msg%n"/>
+    </Console>
+    <Console name="Error" target="SYSTEM_ERR">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </Console>
   </Appenders>
   <Loggers>
     <Root level="info">
-      <AppenderRef ref="Console"/>
+      <AppenderRef ref="Default"/>
     </Root>
+    <Logger name="error" level="error">
+      <AppenderRef ref="Error"/>
+    </Logger>
   </Loggers>
 </Configuration>
