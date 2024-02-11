@@ -101,6 +101,7 @@ tasks.test {
 
 buildConfig {
   buildConfigField("VERSION_NAME", version.toString())
+  buildConfigField("COMMAND_NAME", baseName)
   packageName = "io.github.goooler.exporter"
 }
 
@@ -119,6 +120,7 @@ val r8: Configuration by configurations.creating
 dependencies {
   implementation("org.apache.poi:poi:5.2.5")
   implementation("org.jdom:jdom2:2.0.6.1")
+  implementation("com.github.ajalt.clikt:clikt:4.2.2")
 
   r8("com.android.tools:r8:8.2.42")
 
