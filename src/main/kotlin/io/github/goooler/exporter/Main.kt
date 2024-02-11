@@ -9,11 +9,11 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.options.versionOption
 
-fun main(vararg args: String) = ExporterCommand
+fun main(vararg args: String) = ExporterCommand()
   .versionOption(BuildConfig.VERSION_NAME)
   .main(args.toList())
 
-private object ExporterCommand : CliktCommand(
+private class ExporterCommand : CliktCommand(
   name = BuildConfig.CLI_NAME,
   help = "Facilitate the export and import of string resources between Android projects and XLS files.",
 ) {
