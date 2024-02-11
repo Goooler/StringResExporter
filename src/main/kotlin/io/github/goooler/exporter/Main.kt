@@ -1,7 +1,9 @@
 package io.github.goooler.exporter
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.ParameterHolder
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.OptionWithValues
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
@@ -11,16 +13,13 @@ fun main(vararg args: String) = ExporterCommand()
   .versionOption(BuildConfig.VERSION_NAME)
   .main(args.toList())
 
-class ExporterCommand : CliktCommand(
-  name = BuildConfig.COMMAND_NAME,
+private class ExporterCommand : CliktCommand(
+  name = BuildConfig.CLI_NAME,
   help = "Facilitate the export and import of string resources between Android projects and XLS files.",
 ) {
-  val converter by option(
-    help = "The command to convert resources to XLS or XLS to resources.",
-  ).switch("--res2xls" to ConverterType.Res2Xls, "--xls2res" to ConverterType.Xls2Res)
-    .default(ConverterType.Res2Xls)
-  val inputPath by argument(help = "The input path of the resources or XLS file.")
-  val outputPath by argument(help = "The output path of the resources or XLS file.")
+  private val converter by converterType()
+  private val inputPath by argument(help = "The input path of the resources or XLS file.")
+  private val outputPath by argument(help = "The output path of the resources or XLS file.")
 
   override fun run() {
     when (converter) {
@@ -30,9 +29,18 @@ class ExporterCommand : CliktCommand(
   }
 }
 
-enum class ConverterType {
+private enum class ConverterType {
   Res2Xls,
   Xls2Res,
+}
+
+private fun ParameterHolder.converterType(): OptionWithValues<ConverterType, ConverterType, String> {
+  return option(help = "The command to convert resources to XLS or XLS to resources.")
+    .switch(
+      "--res2xls" to ConverterType.Res2Xls,
+      "--xls2res" to ConverterType.Xls2Res,
+    )
+    .default(ConverterType.Res2Xls)
 }
 
 internal const val SUCCESS_OUTPUT = "Convert finished, output path:"
