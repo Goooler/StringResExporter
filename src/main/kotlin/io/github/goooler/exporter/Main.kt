@@ -9,11 +9,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.options.versionOption
 
-fun main(vararg args: String) = ExporterCommand()
-  .versionOption(BuildConfig.VERSION_NAME)
-  .main(args.toList())
+fun main(vararg args: String) = ExporterCommand().main(args.toList())
 
-private class ExporterCommand : CliktCommand(
+private class ExporterCommand private constructor() : CliktCommand(
   name = BuildConfig.CLI_NAME,
   help = "Facilitate the export and import of string resources between Android projects and XLS files.",
 ) {
@@ -26,6 +24,11 @@ private class ExporterCommand : CliktCommand(
       ConverterType.Res2Xls -> res2xls(inputPath, outputPath)
       ConverterType.Xls2Res -> xls2res(inputPath, outputPath)
     }
+  }
+
+  companion object {
+    operator fun invoke(): ExporterCommand = ExporterCommand()
+      .versionOption(BuildConfig.VERSION_NAME, names = setOf("--version", "-v"))
   }
 }
 
