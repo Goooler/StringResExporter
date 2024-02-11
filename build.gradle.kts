@@ -1,5 +1,6 @@
 plugins {
   kotlin("jvm") version "1.9.22"
+  id("com.github.gmazzo.buildconfig") version "5.3.5"
   id("com.diffplug.spotless") version "6.25.0"
   id("com.android.lint") version "8.2.2"
 }
@@ -98,6 +99,11 @@ tasks.test {
   useJUnitPlatform()
 }
 
+buildConfig {
+  buildConfigField("VERSION_NAME", version.toString())
+  packageName = "io.github.goooler.exporter"
+}
+
 spotless {
   kotlin {
     ktlint()
@@ -113,6 +119,7 @@ val r8: Configuration by configurations.creating
 dependencies {
   implementation("org.apache.poi:poi:5.2.5")
   implementation("org.jdom:jdom2:2.0.6.1")
+  implementation("com.github.ajalt.clikt:clikt:4.2.2")
 
   r8("com.android.tools:r8:8.2.42")
 
