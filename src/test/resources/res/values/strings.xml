@@ -9,6 +9,8 @@
   <string name="forth">forth</string>
   <string name="fifth">fifth</string>
 
+  <string name="sixth" translatable="false">Sixth</string>
+
   <!--Plurals-->
 
   <plurals name="apples">
@@ -19,6 +21,11 @@
   <plurals name="bananas">
     <item quantity="other">bananas</item>
     <item quantity="one">banana</item>
+  </plurals>
+
+  <plurals name="oranges" translatable="false">
+    <item quantity="one">orange</item>
+    <item quantity="other">oranges</item>
   </plurals>
 
   <!--Arrays-->
@@ -35,5 +42,11 @@
     <item>bird</item>
     <item>fish</item>
   </string-array>
+
+  <array name="vegetables" translatable="false">
+    <item>carrot</item>
+    <item>potato</item>
+    <item>onion</item>
+  </array>
 
 </resources>
