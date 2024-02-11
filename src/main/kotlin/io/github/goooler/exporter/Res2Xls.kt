@@ -161,6 +161,7 @@ internal fun Element.toArrayResOrNull(): ArrayRes? {
 }
 
 internal fun Element.toTransResOrNull(): TranslatableRes? {
+  if (getAttributeValue("translatable") == "false") return null
   return toStringResOrNull() ?: toPluralsResOrNull() ?: toArrayResOrNull()
 }
 
