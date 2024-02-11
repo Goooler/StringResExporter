@@ -14,7 +14,6 @@ fun main(vararg args: String) = ExporterCommand().main(args.toList())
 internal const val SUCCESS_OUTPUT = "Convert finished, output path:"
 
 private class ExporterCommand private constructor() : CliktCommand(
-  name = BuildConfig.CLI_NAME,
   help = "Facilitate the export and import of string resources between Android projects and XLS files.",
 ) {
   private val converter by converterType()

@@ -101,7 +101,6 @@ tasks.test {
 
 buildConfig {
   buildConfigField("VERSION_NAME", version.toString())
-  buildConfigField("CLI_NAME", baseName)
   packageName = "io.github.goooler.exporter"
 }
 
