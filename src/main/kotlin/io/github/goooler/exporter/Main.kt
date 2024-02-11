@@ -7,6 +7,7 @@ fun main(vararg args: String) {
     "--xls2res" -> xls2res(inputPath, outputPath)
     else -> error("Unknown command: $command")
   }
+  BuildConfig.VERSION_NAME
 }
 
 internal const val SUCCESS_OUTPUT = "Convert finished, output path:"

@@ -1,5 +1,6 @@
 plugins {
   kotlin("jvm") version "1.9.22"
+  id("com.github.gmazzo.buildconfig") version "5.3.5"
   id("com.diffplug.spotless") version "6.25.0"
   id("com.android.lint") version "8.2.2"
 }
@@ -96,6 +97,11 @@ tasks.test {
   systemProperty("CLI_PATH", binaryFile.get().absolutePath)
 
   useJUnitPlatform()
+}
+
+buildConfig {
+  buildConfigField("VERSION_NAME", version.toString())
+  packageName = "io.github.goooler.exporter"
 }
 
 spotless {
