@@ -11,6 +11,8 @@ import com.github.ajalt.clikt.parameters.options.versionOption
 
 fun main(vararg args: String) = ExporterCommand().main(args.toList())
 
+internal const val SUCCESS_OUTPUT = "Convert finished, output path:"
+
 private class ExporterCommand private constructor() : CliktCommand(
   name = BuildConfig.CLI_NAME,
   help = "Facilitate the export and import of string resources between Android projects and XLS files.",
@@ -45,5 +47,3 @@ private fun ParameterHolder.converterType(): OptionWithValues<ConverterType, Con
     )
     .default(ConverterType.Res2Xls)
 }
-
-internal const val SUCCESS_OUTPUT = "Convert finished, output path:"
