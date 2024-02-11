@@ -41,7 +41,7 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
       val value = cell.stringValue
       stringResMap.getOrPut(folderName) {
         mutableListOf()
-      }.add(StringRes(key, true, value))
+      }.add(StringRes(key, value))
     }
   }
 
@@ -80,7 +80,7 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
       val quantity = row.getCell(1).stringValue
       if (rowIndex % 6 == 0) {
         val key = row.getCell(0).stringValue
-        val pluralsRes = PluralsRes(key, true).apply {
+        val pluralsRes = PluralsRes(key).apply {
           values[quantity] = cell.stringValue
         }
         pluralsResMap.getOrPut(folderName) {
@@ -140,7 +140,7 @@ internal fun writeArray(workbook: Workbook, outputPath: String) {
       if (key.isEmpty()) {
         arrayList.last().values.mutate() += value
       } else {
-        arrayList.add(ArrayRes(key, true, mutableListOf(value)))
+        arrayList.add(ArrayRes(key, mutableListOf(value)))
       }
     }
   }
