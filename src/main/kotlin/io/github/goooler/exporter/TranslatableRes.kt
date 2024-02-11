@@ -1,15 +1,15 @@
 package io.github.goooler.exporter
 
-sealed class TranslatableRes(
-  val translatable: Boolean = true,
-) {
-  abstract val name: String
+sealed interface TranslatableRes {
+  val name: String
+  val translatable: Boolean
 }
 
 data class StringRes(
   override val name: String,
+  override val translatable: Boolean,
   val value: String,
-) : TranslatableRes() {
+) : TranslatableRes {
   companion object {
     val TAG: String = StringRes::class.java.simpleName
 
@@ -21,8 +21,9 @@ data class StringRes(
 
 data class PluralsRes(
   override val name: String,
+  override val translatable: Boolean,
   val values: MutableMap<String, String> = DEFAULT_VALUES.toMutableMap(),
-) : TranslatableRes() {
+) : TranslatableRes {
   companion object {
     private val DEFAULT_VALUES = mapOf(
       "zero" to "",
@@ -42,8 +43,9 @@ data class PluralsRes(
 
 data class ArrayRes(
   override val name: String,
+  override val translatable: Boolean,
   val values: List<String>,
-) : TranslatableRes() {
+) : TranslatableRes {
   companion object {
     val TAG: String = ArrayRes::class.java.simpleName
 
