@@ -1,15 +1,10 @@
+-allowaccessmodification
 -dontobfuscate
 -keepattributes SourceFile, LineNumberTable
-
--allowaccessmodification
 
 -keep class io.github.goooler.exporter.MainKt {
   public static void main(java.lang.String[]);
 }
-
--dontwarn aQute.bnd.**
--dontwarn org.osgi.**
--dontwarn edu.umd.cs.findbugs.annotations.**
 
 # TODO: remove these after the Clikt bundled Mordant is updated to 2.3.0
 -dontwarn org.graalvm.nativeimage.**
@@ -18,3 +13,5 @@
 
 # I don't need any loggers, remove them as much as possible.
 -assumenosideeffects class org.apache.logging.log4j.** { *; }
+-dontwarn aQute.bnd.**
+-dontwarn org.osgi.**
