@@ -16,4 +16,5 @@
 -dontwarn com.oracle.svm.core.annotate.Delete
 -dontwarn org.graalvm.word.PointerBase
 
--assumenosideeffects class org.apache.logging.log4j.Logger { *; }
+# I don't need any loggers, remove them as much as possible.
+-assumenosideeffects class org.apache.logging.log4j.** { *; }
