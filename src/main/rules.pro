@@ -1,7 +1,7 @@
--allowaccessmodification
 -dontobfuscate
 -keepattributes SourceFile, LineNumberTable
--optimizationpasses 5
+
+-allowaccessmodification
 
 -keep class io.github.goooler.exporter.MainKt {
   public static void main(java.lang.String[]);
