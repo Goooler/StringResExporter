@@ -50,7 +50,7 @@ class MappingTest {
     assertThat(row.getCell(0).stringValue).isEqualTo("Hello World")
 
     row.createCell(1).setCellValue(false)
-    // Incorrect cell value will cause the process to exit abnormally by invoking `errorOutput`.
+    // Incorrect cell value will cause the process to exit abnormally by invoking `outputError`.
     row.getCell(1).stringValue
   }
 

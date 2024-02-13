@@ -18,17 +18,17 @@ fun xls2res(inputPath: String, outputPath: String) {
     WorkbookFactory.create(Paths.get(inputPath).inputStream())
   } catch (_: IOException) {
     // This is a trade-off for Jar size, see https://github.com/Goooler/StringResExporter/pull/23.
-    errorOutput("We support XLS file only, invalid format in $inputPath")
+    outputError("We support XLS file only, invalid format in $inputPath")
   }
   writeStrings(workbook, outputPath)
   writePlurals(workbook, outputPath)
   writeArray(workbook, outputPath)
-  infoOutput("$SUCCESS_OUTPUT $outputPath")
+  outputInfo("$SUCCESS_OUTPUT $outputPath")
 }
 
 internal fun writeStrings(workbook: Workbook, outputPath: String) {
   val stringSheet = workbook.getSheet(StringRes.TAG) ?: run {
-    warnOutput("Sheet ${StringRes.TAG} not found.")
+    outputWarn("Sheet ${StringRes.TAG} not found.")
     return
   }
   val stringResMap = mutableMapOf<String, MutableList<StringRes>>()
@@ -68,7 +68,7 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
 
 internal fun writePlurals(workbook: Workbook, outputPath: String) {
   val pluralsSheet = workbook.getSheet(PluralsRes.TAG) ?: run {
-    warnOutput("Sheet ${PluralsRes.TAG} not found.")
+    outputWarn("Sheet ${PluralsRes.TAG} not found.")
     return
   }
   val pluralsResMap = mutableMapOf<String, MutableList<PluralsRes>>()
@@ -123,7 +123,7 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
 
 internal fun writeArray(workbook: Workbook, outputPath: String) {
   val arraySheet = workbook.getSheet(ArrayRes.TAG) ?: run {
-    warnOutput("Sheet ${ArrayRes.TAG} not found.")
+    outputWarn("Sheet ${ArrayRes.TAG} not found.")
     return
   }
   val arrayResMap = mutableMapOf<String, MutableList<ArrayRes>>()
@@ -173,7 +173,7 @@ internal val Cell.stringValue: String
     val original = try {
       stringCellValue
     } catch (_: IllegalStateException) {
-      errorOutput("Cell in sheet ${sheet.sheetName} row $rowIndex and column $columnIndex is not a string.")
+      outputError("Cell in sheet ${sheet.sheetName} row $rowIndex and column $columnIndex is not a string.")
     }
     return original.trim().replace(NBSP, SPACE)
   }
@@ -184,4 +184,4 @@ internal const val SPACE = '\u0020'
 private fun Row.isEmpty(): Boolean = all { it.stringCellValue.trim().isEmpty() }
 
 private fun <T : Any> List<T>.mutate(): MutableList<T> = this as? MutableList<T>
-  ?: errorOutput("List $this is not mutable.")
+  ?: outputError("List $this is not mutable.")
