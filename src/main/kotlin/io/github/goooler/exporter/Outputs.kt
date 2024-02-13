@@ -13,12 +13,12 @@ internal fun warnOutput(message: Any) {
 }
 
 internal fun errorOutput(message: Any): Nothing {
-  output("Error: $message", TextColors.red)
+  output("Error: $message", TextColors.red, true)
   exitProcess(1)
 }
 
-private fun output(message: String, color: TextColors) {
-  terminal.println((color(message)))
+private fun output(message: String, color: TextColors, stderr: Boolean = false) {
+  terminal.println(message = (color(message)), stderr = stderr)
 }
 
 private val terminal = Terminal()
