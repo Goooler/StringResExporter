@@ -103,8 +103,6 @@ tasks.test {
   dependsOn(binaryJar)
   systemProperty("CLI_PATH", binaryFile.get().absolutePath)
 
-  maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
-
   useJUnitPlatform()
 }
 
