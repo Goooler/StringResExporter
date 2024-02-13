@@ -52,7 +52,7 @@ class MappingTest {
     assertThat(row.getCell(0).stringValue).isEqualTo("Hello World")
     assertFailure {
       row.getCell(1).stringValue
-    }.hasMessage("Cell in sheet test row 0 and column 1 is not a string.")
+    }.hasMessage("Error: Cell in sheet test row 0 and column 1 is not a string.")
   }
 
   private fun parseElements(resPath: String = "/res/values-it/strings.xml"): List<Element> {
