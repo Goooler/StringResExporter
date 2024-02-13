@@ -130,7 +130,7 @@ fun res2xls(inputPath: String, outputPath: String) {
     workbook.use { it.write(fos) }
   }
 
-  println("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
+  outputInfo("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
 }
 
 internal fun Element.toStringResOrNull(): StringRes? {

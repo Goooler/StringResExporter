@@ -131,6 +131,7 @@ dependencies {
   r8("com.android.tools:r8:8.2.42")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+  testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
   testImplementation("com.willowtreeapps.assertk:assertk:0.28.0")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
