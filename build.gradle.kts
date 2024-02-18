@@ -39,7 +39,6 @@ tasks.shadowJar {
     "META-INF/LGPL2.1",
     "META-INF/maven/**",
     "META-INF/native-image/**",
-    "META-INF/proguard/**",
     "META-INF/*.version",
     "**/*.proto",
     "**/*.dex",
@@ -73,13 +72,15 @@ val r8Jar by tasks.registering(JavaExec::class) {
 }
 
 val binaryFile = layout.buildDirectory.file("libs/$baseName-$version-binary.jar").map { it.asFile }
-val binaryJar by tasks.registering(Task::class) {
+val binaryJar by tasks.registering(Copy::class) {
   dependsOn(r8Jar)
 
   val r8FileProvider = layout.file(r8File)
   val binaryFileProvider = layout.file(binaryFile)
   inputs.files(r8FileProvider)
   outputs.file(binaryFileProvider)
+
+  exclude("META-INF/proguard/**")
 
   doLast {
     val r8File = r8FileProvider.get().asFile
