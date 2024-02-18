@@ -39,6 +39,7 @@ tasks.shadowJar {
     "META-INF/LGPL2.1",
     "META-INF/maven/**",
     "META-INF/native-image/**",
+    "META-INF/proguard/**",
     "META-INF/*.version",
     "**/*.proto",
     "**/*.dex",
