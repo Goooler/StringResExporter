@@ -61,7 +61,7 @@ val r8Jar by tasks.registering(JavaExec::class) {
   outputs.file(r8File)
 
   classpath(r8)
-  mainClass = "com.android.tools.r8.R8"
+  mainClass = com.android.tools.r8.R8::class.java.canonicalName
   args(
     "--release",
     "--classfile",
