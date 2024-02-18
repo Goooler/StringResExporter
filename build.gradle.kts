@@ -1,6 +1,7 @@
 plugins {
   kotlin("jvm") version "1.9.22"
   id("com.github.gmazzo.buildconfig") version "5.3.5"
+  id("com.github.johnrengelman.shadow") version "8.1.1"
   id("com.diffplug.spotless") version "6.25.0"
   id("com.android.lint") version "8.2.2"
 }
@@ -22,14 +23,8 @@ tasks.withType<Jar>().configureEach {
   }
 }
 
-val fatJar by tasks.registering(Jar::class) {
-  dependsOn(configurations.runtimeClasspath)
+tasks.shadowJar {
   dependsOn(tasks.jar)
-
-  from(sourceSets.main.map { it.output.classesDirs + it.output.resourcesDir })
-  from(configurations.runtimeClasspath.map { it.asFileTree.files.map(::zipTree) })
-
-  archiveClassifier = "fat"
 
   exclude(
     "**/*.kotlin_metadata",
@@ -58,9 +53,9 @@ val fatJar by tasks.registering(Jar::class) {
 val r8File = layout.buildDirectory.file("libs/$baseName-$version-r8.jar").map { it.asFile }
 val rulesFile = project.file("src/main/rules.pro")
 val r8Jar by tasks.registering(JavaExec::class) {
-  dependsOn(fatJar)
+  dependsOn(tasks.shadowJar)
 
-  val fatJarFile = fatJar.get().archiveFile
+  val fatJarFile = tasks.shadowJar.map { it.outputs.files.singleFile }
   inputs.file(fatJarFile)
   inputs.file(rulesFile)
   outputs.file(r8File)
