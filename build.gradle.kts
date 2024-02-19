@@ -1,6 +1,7 @@
 plugins {
   kotlin("jvm") version "1.9.22"
   id("com.github.gmazzo.buildconfig") version "5.3.5"
+  id("io.github.goooler.shadow") version "8.1.3"
   id("com.diffplug.spotless") version "6.25.0"
   id("com.android.lint") version "8.2.2"
 }
@@ -22,14 +23,8 @@ tasks.withType<Jar>().configureEach {
   }
 }
 
-val fatJar by tasks.registering(Jar::class) {
-  dependsOn(configurations.runtimeClasspath)
+tasks.shadowJar {
   dependsOn(tasks.jar)
-
-  from(sourceSets.main.map { it.output.classesDirs + it.output.resourcesDir })
-  from(configurations.runtimeClasspath.map { it.asFileTree.files.map(::zipTree) })
-
-  archiveClassifier = "fat"
 
   exclude(
     "**/*.kotlin_metadata",
@@ -44,7 +39,6 @@ val fatJar by tasks.registering(Jar::class) {
     "META-INF/LGPL2.1",
     "META-INF/maven/**",
     "META-INF/native-image/**",
-    "META-INF/proguard/**",
     "META-INF/*.version",
     "**/*.proto",
     "**/*.dex",
@@ -58,27 +52,27 @@ val fatJar by tasks.registering(Jar::class) {
 val r8File = layout.buildDirectory.file("libs/$baseName-$version-r8.jar").map { it.asFile }
 val rulesFile = project.file("src/main/rules.pro")
 val r8Jar by tasks.registering(JavaExec::class) {
-  dependsOn(fatJar)
+  dependsOn(tasks.shadowJar)
 
-  val fatJarFile = fatJar.get().archiveFile
+  val fatJarFile = tasks.shadowJar.get().archiveFile
   inputs.file(fatJarFile)
   inputs.file(rulesFile)
   outputs.file(r8File)
 
   classpath(r8)
-  mainClass = "com.android.tools.r8.R8"
+  mainClass = com.android.tools.r8.R8::class.java.canonicalName
   args(
     "--release",
     "--classfile",
     "--output", r8File.get().path,
     "--pg-conf", rulesFile.path,
-    "--lib", System.getProperty("java.home"),
+    "--lib", providers.systemProperty("java.home").get(),
     fatJarFile.get().toString(),
   )
 }
 
 val binaryFile = layout.buildDirectory.file("libs/$baseName-$version-binary.jar").map { it.asFile }
-val binaryJar by tasks.registering(Task::class) {
+val binaryJar by tasks.registering {
   dependsOn(r8Jar)
 
   val r8FileProvider = layout.file(r8File)
@@ -127,6 +121,7 @@ dependencies {
   implementation("org.apache.poi:poi:5.2.5")
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("com.github.ajalt.clikt:clikt:4.2.2")
+  implementation("com.github.ajalt.mordant:mordant:2.3.0")
 
   r8("com.android.tools:r8:8.2.47")
 
