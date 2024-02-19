@@ -66,21 +66,19 @@ val r8Jar by tasks.registering(JavaExec::class) {
     "--classfile",
     "--output", r8File.get().path,
     "--pg-conf", rulesFile.path,
-    "--lib", System.getProperty("java.home"),
+    "--lib", providers.systemProperty("java.home").get(),
     fatJarFile.get().toString(),
   )
 }
 
 val binaryFile = layout.buildDirectory.file("libs/$baseName-$version-binary.jar").map { it.asFile }
-val binaryJar by tasks.registering(Copy::class) {
+val binaryJar by tasks.registering {
   dependsOn(r8Jar)
 
   val r8FileProvider = layout.file(r8File)
   val binaryFileProvider = layout.file(binaryFile)
   inputs.files(r8FileProvider)
   outputs.file(binaryFileProvider)
-
-  exclude("META-INF/proguard/**")
 
   doLast {
     val r8File = r8FileProvider.get().asFile
