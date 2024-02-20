@@ -13,23 +13,22 @@ fun main(vararg args: String) = ExporterCommand().main(args.toList())
 
 internal const val SUCCESS_OUTPUT = "Convert finished, output path:"
 
-private class ExporterCommand private constructor() : CliktCommand(
+private class ExporterCommand : CliktCommand(
   help = "Facilitate the export and import of string resources between Android projects and XLS files.",
 ) {
   private val converter by converterType()
   private val inputPath by argument(help = "The input path of the resources or XLS file.")
   private val outputPath by argument(help = "The output path of the resources or XLS file.")
 
+  init {
+    versionOption(BuildConfig.VERSION_NAME, names = setOf("-v", "--version"))
+  }
+
   override fun run() {
     when (converter) {
       ConverterType.Res2Xls -> res2xls(inputPath, outputPath)
       ConverterType.Xls2Res -> xls2res(inputPath, outputPath)
     }
-  }
-
-  companion object {
-    operator fun invoke(): ExporterCommand = ExporterCommand()
-      .versionOption(BuildConfig.VERSION_NAME, names = setOf("--version", "-v"))
   }
 }
 
