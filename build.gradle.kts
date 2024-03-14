@@ -121,7 +121,7 @@ dependencies {
   implementation("org.apache.poi:poi:5.2.5")
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("com.github.ajalt.clikt:clikt:4.2.2")
-  implementation("com.github.ajalt.mordant:mordant:2.3.0")
+  implementation("com.github.ajalt.mordant:mordant:2.4.0")
 
   r8("com.android.tools:r8:8.2.47")
 
