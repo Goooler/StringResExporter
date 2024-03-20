@@ -3,8 +3,6 @@ package io.github.goooler.exporter
 import io.github.goooler.exporter.ArrayRes.Companion.map
 import io.github.goooler.exporter.PluralsRes.Companion.map
 import io.github.goooler.exporter.StringRes.Companion.map
-import java.io.File
-import java.io.FileOutputStream
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
@@ -12,6 +10,7 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
+import kotlin.io.path.outputStream
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
@@ -125,12 +124,12 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
   }
 
-  val outputFile = File(outputPath, "output.xls")
-  FileOutputStream(outputFile).use { fos ->
-    workbook.use { it.write(fos) }
+  val path = Paths.get(outputPath, "output.xls")
+  path.outputStream().use { os ->
+    workbook.use { it.write(os) }
   }
 
-  outputInfo("$SUCCESS_OUTPUT ${outputFile.absolutePath}")
+  outputInfo("$SUCCESS_OUTPUT ${path.normalize()}")
 }
 
 internal fun Element.toStringResOrNull(): StringRes? {

@@ -1,9 +1,10 @@
 package io.github.goooler.exporter
 
-import java.io.File
 import java.io.IOException
 import java.nio.file.Paths
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
@@ -23,7 +24,7 @@ fun xls2res(inputPath: String, outputPath: String) {
   writeStrings(workbook, outputPath)
   writePlurals(workbook, outputPath)
   writeArray(workbook, outputPath)
-  outputInfo("$SUCCESS_OUTPUT $outputPath")
+  outputInfo("$SUCCESS_OUTPUT ${Paths.get(outputPath).normalize()}")
 }
 
 internal fun writeStrings(workbook: Workbook, outputPath: String) {
@@ -60,9 +61,10 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
 
     val document = Document(rootElement)
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
-    val outputFile = File(outputPath, "$folderName/strings.xml")
-    outputFile.parentFile.mkdirs()
-    xmlOutputter.output(document, outputFile.outputStream())
+    Paths.get(outputPath, "$folderName/strings.xml").also { path ->
+      path.createParentDirectories()
+      xmlOutputter.output(document, path.outputStream())
+    }
   }
 }
 
@@ -115,9 +117,10 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
 
     val document = Document(rootElement)
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
-    val outputFile = File(outputPath, "$folderName/plurals.xml")
-    outputFile.parentFile.mkdirs()
-    xmlOutputter.output(document, outputFile.outputStream())
+    Paths.get(outputPath, "$folderName/plurals.xml").also { path ->
+      path.createParentDirectories()
+      xmlOutputter.output(document, path.outputStream())
+    }
   }
 }
 
@@ -162,9 +165,10 @@ internal fun writeArray(workbook: Workbook, outputPath: String) {
 
     val document = Document(rootElement)
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
-    val outputFile = File(outputPath, "$folderName/arrays.xml")
-    outputFile.parentFile.mkdirs()
-    xmlOutputter.output(document, outputFile.outputStream())
+    Paths.get(outputPath, "$folderName/arrays.xml").also { path ->
+      path.createParentDirectories()
+      xmlOutputter.output(document, path.outputStream())
+    }
   }
 }
 
