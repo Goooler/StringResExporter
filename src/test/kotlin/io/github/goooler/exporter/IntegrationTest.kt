@@ -11,7 +11,6 @@ import java.nio.file.Paths
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.copyToRecursively
-import kotlin.io.path.deleteExisting
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
@@ -155,7 +154,7 @@ class IntegrationTest {
     @JvmStatic
     @AfterAll
     fun after() {
-      tempDir.deleteExisting()
+      tempDir.toFile().delete()
     }
   }
 }
