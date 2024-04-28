@@ -1,9 +1,9 @@
 plugins {
-  kotlin("jvm") version "1.9.22"
+  kotlin("jvm") version "1.9.23"
   id("com.github.gmazzo.buildconfig") version "5.3.5"
-  id("io.github.goooler.shadow") version "8.1.5"
+  id("io.github.goooler.shadow") version "8.1.7"
   id("com.diffplug.spotless") version "6.25.0"
-  id("com.android.lint") version "8.2.2"
+  id("com.android.lint") version "8.3.2"
 }
 
 version = "0.3.0-SNAPSHOT"
@@ -120,14 +120,14 @@ val r8: Configuration by configurations.creating
 dependencies {
   implementation("org.apache.poi:poi:5.2.5")
   implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("com.github.ajalt.clikt:clikt:4.2.2")
-  implementation("com.github.ajalt.mordant:mordant:2.3.0")
+  implementation("com.github.ajalt.clikt:clikt:4.4.0")
+  implementation("com.github.ajalt.mordant:mordant:2.5.0")
 
   r8("com.android.tools:r8:8.2.47")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
   testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
-  testImplementation("com.willowtreeapps.assertk:assertk:0.28.0")
+  testImplementation("com.willowtreeapps.assertk:assertk:0.28.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
   lintChecks("com.jzbrooks:assertk-lint:1.1.1")
