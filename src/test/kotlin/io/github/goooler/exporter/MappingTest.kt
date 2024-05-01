@@ -20,6 +20,7 @@ class MappingTest {
       StringRes("first", "primo"),
       StringRes("forth", "quarto"),
       StringRes("seventh", "settimo"),
+      StringRes("countdown", "\n <xliff:g id=\"time\" example=\"5 days\">%1\$s</xliff:g> fino alle vacanze\n"),
     )
     assertThat(stringResList).containsExactly(*actual)
   }
