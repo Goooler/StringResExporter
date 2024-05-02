@@ -8,7 +8,7 @@
   <string name="seventh">settimo</string>
 
   <string name="countdown">
-    <xliff:g id="time" example="5 days">%1$s</xliff:g> fino alle vacanze
+    <xliff:g id="time">%1$s</xliff:g> fino alle vacanze <xliff:g id="end">%1$s</xliff:g> all.
   </string>
 
   <!--Plurals-->
