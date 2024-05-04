@@ -179,7 +179,7 @@ internal val Cell.stringValue: String
     } catch (_: IllegalStateException) {
       outputError("Cell in sheet ${sheet.sheetName} row $rowIndex and column $columnIndex is not a string.")
     }
-    return original.trim().htmlDecode()
+    return original.trim().replace(NBSP, SPACE)
   }
 
 internal const val NBSP = '\u00A0'
@@ -189,12 +189,3 @@ private fun Row.isEmpty(): Boolean = all { it.stringCellValue.trim().isEmpty() }
 
 private fun <T : Any> List<T>.mutate(): MutableList<T> = this as? MutableList<T>
   ?: outputError("List $this is not mutable.")
-
-private fun String.htmlDecode(): String {
-  return replace("&lt;", "<")
-    .replace("&gt;", ">")
-    .replace("&amp;", "&")
-    .replace("&#39;", "'")
-    .replace("&quot;", "\"")
-    .replace(NBSP, SPACE)
-}
