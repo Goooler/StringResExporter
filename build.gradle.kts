@@ -1,5 +1,5 @@
 plugins {
-  kotlin("jvm") version "1.9.24"
+  kotlin("jvm") version "2.0.0"
   id("com.github.gmazzo.buildconfig") version "5.3.5"
   id("io.github.goooler.shadow") version "8.1.7"
   id("com.diffplug.spotless") version "6.25.0"
