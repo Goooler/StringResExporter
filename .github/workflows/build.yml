@@ -39,8 +39,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
-      - name: Unzip string-res-exporter-binary.jar.zip
-        run: unzip string-res-exporter-binary.jar.zip
       - name: Find binary.jar
         run: echo "BINARY_JAR=$(find . -name '*.binary.jar')" >> $GITHUB_ENV
       - name: Create release and upload binary.jar
