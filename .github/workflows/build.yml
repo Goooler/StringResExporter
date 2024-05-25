@@ -48,4 +48,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" "./$BINARY_JAR" -p -t "${{ github.ref_name }}" --generate-notes
+          gh release create "${{ github.ref_name }}" "./$BINARY_JAR" -t "${{ github.ref_name }}" --generate-notes
