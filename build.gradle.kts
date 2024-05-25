@@ -6,7 +6,7 @@ plugins {
   id("com.android.lint") version "8.6.0"
 }
 
-version = "0.2.4"
+version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
 java {
