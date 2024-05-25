@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - trunk
+    tags:
+      - '**'
   workflow_dispatch:
 
 jobs:
@@ -27,3 +29,22 @@ jobs:
           name: string-res-exporter-binary.jar
           path: build/libs/string-res-exporter-*-binary.jar
           if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'Goooler' && startsWith(github.ref, 'refs/tags/')
+    needs: build
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+      - name: Unzip string-res-exporter-binary.jar.zip
+        run: unzip string-res-exporter-binary.jar.zip
+      - name: Find binary.jar
+        run: echo "BINARY_JAR=$(find . -name '*.binary.jar')" >> $GITHUB_ENV
+      - name: Create release and upload binary.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" "./$BINARY_JAR" -p -t "${{ github.ref_name }}" --generate-notes
