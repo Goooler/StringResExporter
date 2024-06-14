@@ -1,7 +1,13 @@
 pluginManagement {
   repositories {
     mavenCentral()
-    google()
+    google {
+      content {
+        includeGroupByRegex("com\\.android.*")
+        includeGroupByRegex("com\\.google.*")
+        includeGroupByRegex("androidx.*")
+      }
+    }
     gradlePluginPortal()
   }
 }
@@ -24,7 +30,13 @@ develocity {
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
-    google()
+    google {
+      content {
+        includeGroupByRegex("com\\.android.*")
+        includeGroupByRegex("com\\.google.*")
+        includeGroupByRegex("androidx.*")
+      }
+    }
   }
 }
 
