@@ -13,7 +13,17 @@ class CommandLineTestRunner(
     val exitCode = process.waitFor()
 
     val err = process.errorStream.readBytes().toString(StandardCharsets.UTF_8)
-    val out = process.inputStream.readBytes().toString(StandardCharsets.UTF_8)
+    val originalOut = process.inputStream.readBytes().toString(StandardCharsets.UTF_8)
+    // If ANSI escape codes are not supported, remove them from the output
+    val out = if (System.console() == null) {
+      originalOut.replace("\u001B\\[.*?m".toRegex(), "")
+    } else {
+      originalOut
+    }
+
+    if (!out.startsWith(SUCCESS_OUTPUT)) {
+      error("Output is not correct: $out")
+    }
 
     if (exitCode != 0 || err.isNotEmpty()) {
       error("Error occurred when running command line: $err")
