@@ -2,10 +2,10 @@ pluginManagement {
   repositories {
     mavenCentral()
     google {
-      content {
-        includeGroupByRegex("com\\.android.*")
-        includeGroupByRegex("com\\.google.*")
-        includeGroupByRegex("androidx.*")
+      mavenContent {
+        includeGroupAndSubgroups("androidx")
+        includeGroupAndSubgroups("com.android")
+        includeGroupAndSubgroups("com.google")
       }
     }
     gradlePluginPortal()
@@ -31,10 +31,10 @@ dependencyResolutionManagement {
   repositories {
     mavenCentral()
     google {
-      content {
-        includeGroupByRegex("com\\.android.*")
-        includeGroupByRegex("com\\.google.*")
-        includeGroupByRegex("androidx.*")
+      mavenContent {
+        includeGroupAndSubgroups("androidx")
+        includeGroupAndSubgroups("com.android")
+        includeGroupAndSubgroups("com.google")
       }
     }
   }
