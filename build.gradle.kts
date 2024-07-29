@@ -98,7 +98,7 @@ tasks.test {
   systemProperty("CLI_PATH", binaryFile.get().absolutePath)
 
   useJUnitPlatform()
-  maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+  maxParallelForks = Runtime.getRuntime().availableProcessors()
 }
 
 buildConfig {
