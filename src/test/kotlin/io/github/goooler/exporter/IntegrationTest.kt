@@ -5,12 +5,11 @@ import assertk.assertions.containsAtLeast
 import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
-import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.copyToRecursively
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
@@ -31,7 +30,8 @@ class IntegrationTest {
   @ValueSource(booleans = [false, true])
   fun exportAndImport(useCli: Boolean) {
     val importedRes = tempDir.resolve("resInput")
-    Paths.get(requireResource("/res").toURI()).copyToRecursively(importedRes)
+    requireResourceAsPath("/res").copyToRecursively(importedRes)
+    requireResourceAsPath("/res").copyToRecursively(importedRes)
     convert(
       useCli,
       "--res2xls",
@@ -126,7 +126,7 @@ class IntegrationTest {
   }
 
   private fun readCsvValues(name: String): Array<String> {
-    return Paths.get(requireResource("/sheets/$name.csv").toURI()).readLines().asSequence()
+    return requireResourceAsPath("/sheets/$name.csv").readLines().asSequence()
       .flatMap { it.split(",").asSequence() }.toList().toTypedArray()
   }
 
@@ -148,7 +148,7 @@ class IntegrationTest {
     @JvmStatic
     @BeforeAll
     fun before() {
-      tempDir = Files.createTempDirectory(null)
+      tempDir = createTempDirectory()
     }
 
     @JvmStatic

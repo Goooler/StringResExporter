@@ -4,7 +4,7 @@ import io.github.goooler.exporter.ArrayRes.Companion.map
 import io.github.goooler.exporter.PluralsRes.Companion.map
 import io.github.goooler.exporter.StringRes.Companion.map
 import java.nio.file.Path
-import java.nio.file.Paths
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
@@ -124,7 +124,7 @@ fun res2xls(inputPath: String, outputPath: String) {
     }
   }
 
-  val path = Paths.get(outputPath, "output.xls")
+  val path = Path(outputPath, "output.xls")
   path.outputStream().use { os ->
     workbook.use { it.write(os) }
   }
@@ -165,7 +165,7 @@ internal fun Element.toTransResOrNull(): TranslatableRes? {
 }
 
 internal fun parseResFiles(resRoot: String, resFile: String = "strings.xml"): Sequence<Path> {
-  return Paths.get(resRoot).listDirectoryEntries("values*").asSequence()
+  return Path(resRoot).listDirectoryEntries("values*").asSequence()
     .sorted()
     .map { it.resolve(resFile) }
     .filter { it.isRegularFile() && it.exists() }

@@ -1,7 +1,7 @@
 package io.github.goooler.exporter
 
 import java.io.IOException
-import java.nio.file.Paths
+import kotlin.io.path.Path
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
@@ -16,7 +16,7 @@ import org.jdom2.output.XMLOutputter
 
 fun xls2res(inputPath: String, outputPath: String) {
   val workbook = try {
-    WorkbookFactory.create(Paths.get(inputPath).inputStream())
+    WorkbookFactory.create(Path(inputPath).inputStream())
   } catch (_: IOException) {
     // This is a trade-off for Jar size, see https://github.com/Goooler/StringResExporter/pull/23.
     outputError("We support XLS file only, invalid format in $inputPath")
@@ -24,7 +24,7 @@ fun xls2res(inputPath: String, outputPath: String) {
   writeStrings(workbook, outputPath)
   writePlurals(workbook, outputPath)
   writeArray(workbook, outputPath)
-  outputInfo("$SUCCESS_OUTPUT ${Paths.get(outputPath).normalize()}")
+  outputInfo("$SUCCESS_OUTPUT ${Path(outputPath).normalize()}")
 }
 
 internal fun writeStrings(workbook: Workbook, outputPath: String) {
@@ -61,7 +61,7 @@ internal fun writeStrings(workbook: Workbook, outputPath: String) {
 
     val document = Document(rootElement)
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
-    Paths.get(outputPath, "$folderName/strings.xml").also { path ->
+    Path(outputPath, "$folderName/strings.xml").also { path ->
       path.createParentDirectories()
       xmlOutputter.output(document, path.outputStream())
     }
@@ -117,7 +117,7 @@ internal fun writePlurals(workbook: Workbook, outputPath: String) {
 
     val document = Document(rootElement)
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
-    Paths.get(outputPath, "$folderName/plurals.xml").also { path ->
+    Path(outputPath, "$folderName/plurals.xml").also { path ->
       path.createParentDirectories()
       xmlOutputter.output(document, path.outputStream())
     }
@@ -165,7 +165,7 @@ internal fun writeArray(workbook: Workbook, outputPath: String) {
 
     val document = Document(rootElement)
     val xmlOutputter = XMLOutputter(Format.getPrettyFormat())
-    Paths.get(outputPath, "$folderName/arrays.xml").also { path ->
+    Path(outputPath, "$folderName/arrays.xml").also { path ->
       path.createParentDirectories()
       xmlOutputter.output(document, path.outputStream())
     }

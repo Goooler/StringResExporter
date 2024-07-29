@@ -1,7 +1,5 @@
 package io.github.goooler.exporter
 
-import java.nio.charset.StandardCharsets
-
 class CommandLineTestRunner(
   private val converter: String,
   private val inputPath: String,
@@ -12,8 +10,8 @@ class CommandLineTestRunner(
     val process = ProcessBuilder(cliCommand(converter, inputPath, outputPath)).start()
     val exitCode = process.waitFor()
 
-    val err = process.errorStream.readBytes().toString(StandardCharsets.UTF_8)
-    val out = process.inputStream.readBytes().toString(StandardCharsets.UTF_8).let {
+    val err = process.errorStream.readBytes().toString(Charsets.UTF_8)
+    val out = process.inputStream.readBytes().toString(Charsets.UTF_8).let {
       // If ANSI escape codes are not supported, remove them from the output
       if (System.console() == null) it.replace("\u001B\\[.*?m".toRegex(), "") else it
     }
