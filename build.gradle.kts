@@ -1,10 +1,23 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+buildscript {
+  repositories {
+    mavenCentral()
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
+  }
+  dependencies {
+    classpath("com.gradleup.shadow:shadow-gradle-plugin:8.3.0-SNAPSHOT")
+  }
+}
+
 plugins {
   kotlin("jvm") version "2.0.0"
   id("com.github.gmazzo.buildconfig") version "5.4.0"
-  id("io.github.goooler.shadow") version "8.1.8"
   id("com.diffplug.spotless") version "7.0.0.BETA1"
   id("com.android.lint") version "8.5.1"
 }
+
+apply(plugin = "com.gradleup.shadow")
 
 version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
@@ -23,7 +36,7 @@ tasks.withType<Jar>().configureEach {
   }
 }
 
-tasks.shadowJar {
+val shadowJar = tasks.named("shadowJar", ShadowJar::class) {
   dependsOn(tasks.jar)
 
   exclude(
@@ -52,9 +65,9 @@ tasks.shadowJar {
 val r8File = layout.buildDirectory.file("libs/$baseName-$version-r8.jar").map { it.asFile }
 val rulesFile = project.file("src/main/rules.pro")
 val r8Jar by tasks.registering(JavaExec::class) {
-  dependsOn(tasks.shadowJar)
+  dependsOn(shadowJar)
 
-  val fatJarFile = tasks.shadowJar.get().archiveFile
+  val fatJarFile = shadowJar.get().archiveFile
   inputs.file(fatJarFile)
   inputs.file(rulesFile)
   outputs.file(r8File)
