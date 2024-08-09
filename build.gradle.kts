@@ -3,7 +3,7 @@ plugins {
   id("com.github.gmazzo.buildconfig") version "5.4.0"
   id("com.gradleup.shadow") version "8.3.0"
   id("com.diffplug.spotless") version "7.0.0.BETA1"
-  id("com.android.lint") version "8.5.1"
+  id("com.android.lint") version "8.5.2"
 }
 
 version = "0.3.0-SNAPSHOT"
