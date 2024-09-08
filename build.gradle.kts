@@ -10,7 +10,8 @@ version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
 java {
-  toolchain.languageVersion = JavaLanguageVersion.of(8)
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
 tasks.withType<Jar>().configureEach {
