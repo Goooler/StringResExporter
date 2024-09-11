@@ -10,7 +10,8 @@ version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
 java {
-  toolchain.languageVersion = JavaLanguageVersion.of(8)
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
 tasks.withType<Jar>().configureEach {
@@ -126,7 +127,7 @@ dependencies {
   r8("com.android.tools:r8:8.5.35")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
-  testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
+  testImplementation("com.ginsberg:junit5-system-exit:2.0.0")
   testImplementation("com.willowtreeapps.assertk:assertk:0.28.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
