@@ -1,7 +1,7 @@
 package io.github.goooler.exporter
 
-import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.rendering.TextColors
+import com.github.ajalt.mordant.terminal.Terminal
 import kotlin.system.exitProcess
 
 internal fun outputInfo(message: Any) {
@@ -21,4 +21,4 @@ private fun output(message: String, color: TextColors, stderr: Boolean = false) 
   terminal.println(message = color(message), stderr = stderr)
 }
 
-private val terminal = ExporterCommand.currentContext.terminal
+private val terminal = Terminal()
