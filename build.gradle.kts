@@ -121,7 +121,7 @@ val r8: Configuration by configurations.creating
 dependencies {
   implementation("org.apache.poi:poi:5.3.0")
   implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("com.github.ajalt.clikt:clikt:4.4.0")
+  implementation("com.github.ajalt.clikt:clikt:5.0.0")
 
   r8("com.android.tools:r8:8.5.35")
 
