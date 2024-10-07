@@ -26,7 +26,7 @@ class IntegrationTest {
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun exportAndImport(@TempDir tempDir: Path, useCli: Boolean) {
+  fun exportAndImport(useCli: Boolean, @TempDir tempDir: Path) {
     val importedRes = tempDir.resolve("resInput")
     requireResourceAsPath("/res").copyToRecursively(importedRes)
     requireResourceAsPath("/res").copyToRecursively(importedRes)
