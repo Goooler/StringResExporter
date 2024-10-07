@@ -9,7 +9,6 @@ import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.copyToRecursively
-import kotlin.io.path.createTempDirectory
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
@@ -19,12 +18,13 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class IntegrationTest {
+  @TempDir
+  private lateinit var tempDir: Path
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
@@ -138,23 +138,5 @@ class IntegrationTest {
   @OptIn(ExperimentalPathApi::class)
   private fun Path.copyToRecursively(target: Path) {
     copyToRecursively(target, followLinks = true, overwrite = true)
-  }
-
-  companion object {
-    // Workaround for https://github.com/junit-team/junit5/issues/2811.
-    @JvmStatic
-    private lateinit var tempDir: Path
-
-    @JvmStatic
-    @BeforeAll
-    fun before() {
-      tempDir = createTempDirectory()
-    }
-
-    @JvmStatic
-    @AfterAll
-    fun after() {
-      tempDir.toFile().delete()
-    }
   }
 }
