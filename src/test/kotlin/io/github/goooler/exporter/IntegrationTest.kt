@@ -23,10 +23,12 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class IntegrationTest {
+  @TempDir
+  private lateinit var tempDir: Path
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun exportAndImport(useCli: Boolean, @TempDir tempDir: Path) {
+  fun exportAndImport(useCli: Boolean) {
     val importedRes = tempDir.resolve("resInput")
     requireResourceAsPath("/res").copyToRecursively(importedRes)
     requireResourceAsPath("/res").copyToRecursively(importedRes)
