@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
   <!--Strings-->
 
   <string name="first">primo</string>
   <string name="forth">quarto</string>
   <string name="seventh">settimo</string>
+
+  <string name="countdown">
+    <xliff:g id="time">%1$s</xliff:g> fino alle vacanze <xliff:g id="end">%1$s</xliff:g> all.
+  </string>
 
   <!--Plurals-->
 
