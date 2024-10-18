@@ -44,50 +44,25 @@ tasks.shadowJar {
     "**/*.dex",
     "**/LICENSE**",
     "**/NOTICE**",
-    "r8-version.properties",
     "migrateToAndroidx/*",
   )
-}
-
-val r8File = layout.buildDirectory.file("libs/$baseName-$version-r8.jar").map { it.asFile }
-val rulesFile = project.file("src/main/rules.pro")
-val r8Jar by tasks.registering(JavaExec::class) {
-  dependsOn(tasks.shadowJar)
-
-  val fatJarFile = tasks.shadowJar.get().archiveFile
-  inputs.file(fatJarFile)
-  inputs.file(rulesFile)
-  outputs.file(r8File)
-
-  classpath(r8)
-  mainClass = com.android.tools.r8.R8::class.java.canonicalName
-  args(
-    "--release",
-    "--classfile",
-    "--output", r8File.get().path,
-    "--pg-conf", rulesFile.path,
-    "--lib", providers.systemProperty("java.home").get(),
-    fatJarFile.get().toString(),
-  )
+  minimize()
 }
 
 val binaryFile = layout.buildDirectory.file("libs/$baseName-$version-binary.jar").map { it.asFile }
 val binaryJar by tasks.registering {
-  dependsOn(r8Jar)
-
-  val r8FileProvider = layout.file(r8File)
+  val fatJarFile = tasks.shadowJar.get().archiveFile
   val binaryFileProvider = layout.file(binaryFile)
-  inputs.files(r8FileProvider)
+  inputs.files(fatJarFile)
   outputs.file(binaryFileProvider)
 
   doLast {
-    val r8File = r8FileProvider.get().asFile
     val binaryFile = binaryFileProvider.get().asFile
 
     binaryFile.parentFile.mkdirs()
     binaryFile.delete()
     binaryFile.writeText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
-    binaryFile.appendBytes(r8File.readBytes())
+    binaryFile.appendBytes(fatJarFile.get().asFile.readBytes())
 
     binaryFile.setExecutable(true, false)
   }
@@ -116,14 +91,10 @@ spotless {
   }
 }
 
-val r8: Configuration by configurations.creating
-
 dependencies {
   implementation("org.apache.poi:poi:5.3.0")
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("com.github.ajalt.clikt:clikt:5.0.1")
-
-  r8("com.android.tools:r8:8.5.35")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.11.2")
   testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
