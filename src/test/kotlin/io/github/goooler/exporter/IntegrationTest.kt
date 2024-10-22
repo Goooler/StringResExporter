@@ -1,5 +1,6 @@
 package io.github.goooler.exporter
 
+import app.cash.burst.Burst
 import assertk.assertThat
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsExactly
@@ -18,22 +19,23 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.jdom2.Element
 import org.jdom2.input.SAXBuilder
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
-class IntegrationTest {
+@Burst
+class IntegrationTest(
+  private val testCase: TestCase,
+) {
   @TempDir
   private lateinit var tempDir: Path
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun exportAndImport(useCli: Boolean) {
+  @Test
+  fun exportAndImport() {
     val importedRes = tempDir.resolve("resInput")
     requireResourceAsPath("/res").copyToRecursively(importedRes)
     requireResourceAsPath("/res").copyToRecursively(importedRes)
     convert(
-      useCli,
+      testCase.useCli,
       "--res2xls",
       importedRes.absolutePathString(),
       tempDir.absolutePathString(),
@@ -46,7 +48,7 @@ class IntegrationTest {
 
     val exportedRes = tempDir.resolve("resOutput")
     convert(
-      useCli,
+      testCase.useCli,
       "--xls2res",
       exportedXls.absolutePathString(),
       exportedRes.absolutePathString(),
@@ -138,5 +140,10 @@ class IntegrationTest {
   @OptIn(ExperimentalPathApi::class)
   private fun Path.copyToRecursively(target: Path) {
     copyToRecursively(target, followLinks = true, overwrite = true)
+  }
+
+  enum class TestCase(val useCli: Boolean) {
+    Cli(true),
+    Main(false),
   }
 }
