@@ -13,6 +13,7 @@ import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.jdom2.Element
+import org.jdom2.Text
 import org.jdom2.input.SAXBuilder
 
 fun res2xls(inputPath: String, outputPath: String) {
@@ -135,9 +136,30 @@ fun res2xls(inputPath: String, outputPath: String) {
 internal fun Element.toStringResOrNull(): StringRes? {
   if (name != "string") return null
   val key = getAttributeValue("name") ?: return null
+  val containsXlff = content.any { it.toString().contains("xliff") }
+  val rawText = if (containsXlff) {
+    buildString {
+      content.forEach {
+        when {
+          it is Text -> append(it.value)
+          it is Element && it.toString().contains("xliff") -> {
+            val tag = "xliff:${it.name}"
+            append("<$tag ")
+            append(it.attributes.joinToString(" ") { attr -> "${attr.name}=\"${attr.value}\"" })
+            append(">")
+            append((it.content.single() as Text).value)
+            append("</$tag>")
+          }
+          else -> append(it.toString())
+        }
+      }
+    }
+  } else {
+    text
+  }
   return StringRes(
     name = key,
-    value = text,
+    value = rawText,
   )
 }
 
