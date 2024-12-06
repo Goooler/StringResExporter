@@ -24,8 +24,6 @@ tasks.withType<Jar>().configureEach {
 }
 
 tasks.shadowJar {
-  dependsOn(tasks.jar)
-
   exclude(
     "**/*.kotlin_metadata",
     "**/*.kotlin_builtins",
