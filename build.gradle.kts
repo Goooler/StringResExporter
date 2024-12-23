@@ -128,5 +128,5 @@ dependencies {
   testImplementation("com.willowtreeapps.assertk:assertk:0.28.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-  lintChecks("com.jzbrooks:assertk-lint:1.3.0")
+  lintChecks("com.jzbrooks:assertk-lint:1.4.0")
 }
