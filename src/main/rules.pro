@@ -10,6 +10,7 @@
 -dontwarn org.osgi.**
 -dontwarn edu.umd.cs.findbugs.annotations.**
 -dontwarn com.google.errorprone.annotations.**
+-dontwarn org.jspecify.annotations.**
 
 # Used by poi.
 -keep,allowoptimization class org.apache.logging.log4j.** { *; }
