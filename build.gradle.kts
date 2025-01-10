@@ -121,7 +121,7 @@ dependencies {
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("com.github.ajalt.clikt:clikt:5.0.2")
 
-  r8("com.android.tools:r8:8.5.35")
+  r8("com.android.tools:r8:8.7.18")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
   testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
