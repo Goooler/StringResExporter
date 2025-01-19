@@ -3,7 +3,6 @@ plugins {
   id("com.github.gmazzo.buildconfig") version "5.5.1"
   id("com.gradleup.shadow") version "9.0.0-beta4"
   id("com.diffplug.spotless") version "7.0.2"
-  id("com.android.lint") version "8.8.0"
 }
 
 version = "0.3.0-SNAPSHOT"
@@ -58,7 +57,7 @@ val r8Jar by tasks.registering(JavaExec::class) {
   outputs.file(r8File)
 
   classpath(r8)
-  mainClass = com.android.tools.r8.R8::class.java.canonicalName
+  mainClass = "com.android.tools.r8.R8"
   args(
     "--release",
     "--classfile",
@@ -127,6 +126,4 @@ dependencies {
   testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
   testImplementation("com.willowtreeapps.assertk:assertk:0.28.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-  lintChecks("com.jzbrooks:assertk-lint:1.4.0")
 }
