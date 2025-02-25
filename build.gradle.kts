@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   kotlin("jvm") version "2.1.10"
   id("com.github.gmazzo.buildconfig") version "5.5.1"
@@ -9,7 +11,12 @@ version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
 java {
-  toolchain.languageVersion = JavaLanguageVersion.of(8)
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+kotlin {
+  compilerOptions.jvmTarget = JvmTarget.JVM_1_8
 }
 
 tasks.withType<Jar>().configureEach {
@@ -23,6 +30,8 @@ tasks.withType<Jar>().configureEach {
 }
 
 tasks.shadowJar {
+  mergeServiceFiles()
+
   exclude(
     "**/*.kotlin_metadata",
     "**/*.kotlin_builtins",
@@ -96,6 +105,9 @@ tasks.test {
 
   useJUnitPlatform()
   maxParallelForks = Runtime.getRuntime().availableProcessors()
+
+  // https://github.com/tginsberg/junit5-system-exit/issues/10
+  systemProperty("java.security.manager", "allow")
 }
 
 buildConfig {
