@@ -23,6 +23,8 @@ tasks.withType<Jar>().configureEach {
 }
 
 tasks.shadowJar {
+  mergeServiceFiles()
+
   exclude(
     "**/*.kotlin_metadata",
     "**/*.kotlin_builtins",
