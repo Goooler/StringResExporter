@@ -43,5 +43,5 @@ dependencyResolutionManagement {
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
 check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
-  "This project needs to be run with Java 17 or higher (found: ${JavaVersion.current()})."
+  "This project needs to be run with Java 21 or higher (found: ${JavaVersion.current()})."
 }
