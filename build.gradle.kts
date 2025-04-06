@@ -128,7 +128,7 @@ spotless {
 val r8: Configuration by configurations.creating
 
 dependencies {
-  implementation("org.apache.poi:poi:5.4.0")
+  implementation("org.apache.poi:poi:5.4.1")
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("com.github.ajalt.clikt:clikt:5.0.3")
 
