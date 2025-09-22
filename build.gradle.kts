@@ -19,20 +19,20 @@ kotlin {
   compilerOptions.jvmTarget = JvmTarget.JVM_1_8
 }
 
-tasks.withType<Jar>().configureEach {
-  archiveBaseName = baseName
-  archiveVersion = version.toString()
-
-  manifest {
-    attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
-    attributes["Implementation-Version"] = version.toString()
-  }
+tasks.jar {
+  enabled = false
 }
 
 tasks.shadowJar {
+  archiveBaseName = baseName
+  archiveVersion = version.toString()
   duplicatesStrategy = DuplicatesStrategy.INCLUDE
   failOnDuplicateEntries = true
   mergeServiceFiles()
+
+  manifest {
+    attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
+  }
 
   exclude(
     "**/*.kotlin_metadata",
