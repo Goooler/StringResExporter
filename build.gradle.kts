@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   kotlin("jvm") version "2.2.0"
-  id("com.github.gmazzo.buildconfig") version "5.6.7"
+  id("com.github.gmazzo.buildconfig") version "5.6.8"
   id("com.gradleup.shadow") version "9.0.2"
   id("com.diffplug.spotless") version "7.2.1"
 }
