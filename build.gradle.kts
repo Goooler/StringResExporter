@@ -70,6 +70,7 @@ val r8Jar by tasks.registering(JavaExec::class) {
   classpath(r8)
   mainClass = "com.android.tools.r8.R8"
   args(
+    "--release",
     "--classfile",
     "--output", r8File.get().path,
     "--pg-conf", rulesFile.path,
