@@ -71,12 +71,9 @@ val r8Jar by tasks.registering(JavaExec::class) {
   mainClass = "com.android.tools.r8.R8"
   args(
     "--classfile",
-    "--output",
-    r8File.get().path,
-    "--pg-conf",
-    rulesFile.path,
-    "--lib",
-    providers.systemProperty("java.home").get(),
+    "--output", r8File.get().path,
+    "--pg-conf", rulesFile.path,
+    "--lib", providers.systemProperty("java.home").get(),
     fatJarFile.get().toString(),
   )
 }
