@@ -30,10 +30,26 @@ jobs:
           path: build/libs/string-res-exporter-*-binary.jar
           if-no-files-found: error
 
+  # Status check that is required in branch protection rules.
+  build-status:
+    needs:
+      - build
+    runs-on: ubuntu-24.04-arm
+    if: always()
+    steps:
+      - name: Check
+        run: |
+          results=$(tr -d '\n' <<< '${{ toJSON(needs.*.result) }}')
+          if ! grep -q -v -E '(failure|cancelled)' <<< "$results"; then
+            echo "One or more required jobs failed"
+            exit 1
+          fi
+          echo "All required jobs completed successfully."
+
   release:
     runs-on: ubuntu-24.04-arm
     if: github.repository_owner == 'Goooler' && startsWith(github.ref, 'refs/tags/')
-    needs: build
+    needs: build-status
     permissions:
       contents: write
     steps:
