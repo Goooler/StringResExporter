@@ -36,6 +36,7 @@ dependencyResolutionManagement {
         includeGroupAndSubgroups("com.google")
       }
     }
+    maven("https://storage.googleapis.com/r8-releases/raw")
   }
 }
 
