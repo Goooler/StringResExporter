@@ -1,16 +1,14 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-  kotlin("jvm") version "2.2.20"
-  id("com.github.gmazzo.buildconfig") version "5.6.8"
-  id("com.gradleup.shadow") version "9.2.1"
-  id("com.diffplug.spotless") version "7.2.1"
+  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.buildconfig)
+  alias(libs.plugins.shadow)
+  alias(libs.plugins.spotless)
 }
 
 version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
-
-val targetJavaVersion = 11
 
 buildConfig {
   buildConfigField("VERSION_NAME", version.toString())
@@ -18,7 +16,7 @@ buildConfig {
 }
 
 kotlin {
-  compilerOptions.jvmTarget = JvmTarget.fromTarget(targetJavaVersion.toString())
+  compilerOptions.jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
 }
 
 spotless {
@@ -34,20 +32,21 @@ spotless {
 val r8: Configuration by configurations.creating
 
 dependencies {
-  implementation("org.apache.poi:poi:5.4.1")
-  implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("com.github.ajalt.clikt:clikt:5.0.3")
+  implementation(libs.poi)
+  implementation(libs.jdom2)
+  implementation(libs.clikt)
 
-  r8("com.android.tools:r8:8.12.14")
+  r8(libs.r8)
 
-  testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
-  testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
-  testImplementation("com.willowtreeapps.assertk:assertk:0.28.1")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testImplementation(platform(libs.junit.bom))
+  testImplementation(libs.junit.jupiter)
+  testImplementation(libs.junit.systemExit)
+  testImplementation(libs.assertk)
+  testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.withType<JavaCompile>().configureEach {
-  options.release = targetJavaVersion
+  options.release = libs.versions.jdkRelease.get().toInt()
 }
 
 tasks.jar {
