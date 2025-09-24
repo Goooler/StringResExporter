@@ -22,4 +22,4 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.1"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 buildconfig = "com.github.gmazzo.buildconfig:5.6.8"
 shadow = "com.gradleup.shadow:9.2.1"
-spotless = "com.diffplug.spotless:7.2.1"
+spotless = "com.diffplug.spotless:8.0.0"
