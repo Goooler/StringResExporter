@@ -10,29 +10,60 @@ plugins {
 version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
+val targetJavaVersion = 11
+
+buildConfig {
+  buildConfigField("VERSION_NAME", version.toString())
+  packageName = "io.github.goooler.exporter"
 }
 
 kotlin {
-  compilerOptions.jvmTarget = JvmTarget.JVM_1_8
+  compilerOptions.jvmTarget = JvmTarget.fromTarget(targetJavaVersion.toString())
 }
 
-tasks.withType<Jar>().configureEach {
-  archiveBaseName = baseName
-  archiveVersion = version.toString()
-
-  manifest {
-    attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
-    attributes["Implementation-Version"] = version.toString()
+spotless {
+  kotlin {
+    ktlint()
+    target("**/src/**/*.kt")
+  }
+  kotlinGradle {
+    ktlint()
   }
 }
 
+val r8: Configuration by configurations.creating
+
+dependencies {
+  implementation("org.apache.poi:poi:5.4.1")
+  implementation("org.jdom:jdom2:2.0.6.1")
+  implementation("com.github.ajalt.clikt:clikt:5.0.3")
+
+  r8("com.android.tools:r8:8.7.18")
+
+  testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+  testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
+  testImplementation("com.willowtreeapps.assertk:assertk:0.28.1")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.withType<JavaCompile>().configureEach {
+  options.release = targetJavaVersion
+}
+
+tasks.jar {
+  enabled = false
+}
+
 tasks.shadowJar {
+  archiveBaseName = baseName
+  archiveVersion = version.toString()
   duplicatesStrategy = DuplicatesStrategy.INCLUDE
   failOnDuplicateEntries = true
   mergeServiceFiles()
+
+  manifest {
+    attributes["Main-Class"] = "io.github.goooler.exporter.MainKt"
+  }
 
   exclude(
     "**/*.kotlin_metadata",
@@ -110,34 +141,4 @@ tasks.test {
 
   // https://github.com/tginsberg/junit5-system-exit/issues/10
   systemProperty("java.security.manager", "allow")
-}
-
-buildConfig {
-  buildConfigField("VERSION_NAME", version.toString())
-  packageName = "io.github.goooler.exporter"
-}
-
-spotless {
-  kotlin {
-    ktlint()
-    target("**/src/**/*.kt")
-  }
-  kotlinGradle {
-    ktlint()
-  }
-}
-
-val r8: Configuration by configurations.creating
-
-dependencies {
-  implementation("org.apache.poi:poi:5.4.1")
-  implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("com.github.ajalt.clikt:clikt:5.0.3")
-
-  r8("com.android.tools:r8:8.7.18")
-
-  testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
-  testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
-  testImplementation("com.willowtreeapps.assertk:assertk:0.28.1")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
