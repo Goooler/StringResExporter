@@ -10,13 +10,14 @@ plugins {
 version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
-}
+val targetJavaVersion = 11
 
 kotlin {
-  compilerOptions.jvmTarget = JvmTarget.JVM_1_8
+  compilerOptions.jvmTarget = JvmTarget.fromTarget(targetJavaVersion.toString())
+}
+
+tasks.withType<JavaCompile>().configureEach {
+  options.release = targetJavaVersion
 }
 
 tasks.jar {
