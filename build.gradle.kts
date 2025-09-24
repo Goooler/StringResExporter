@@ -21,11 +21,11 @@ kotlin {
 
 spotless {
   kotlin {
-    ktlint()
+    ktlint(libs.ktlint.get().version)
     target("**/src/**/*.kt")
   }
   kotlinGradle {
-    ktlint()
+    ktlint(libs.ktlint.get().version)
   }
 }
 
