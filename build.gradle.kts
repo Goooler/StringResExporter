@@ -16,7 +16,10 @@ buildConfig {
 }
 
 kotlin {
-  compilerOptions.jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
+  compilerOptions {
+    jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
+    freeCompilerArgs.add("-Xjdk-release=${libs.versions.jdkRelease.get()}")
+  }
 }
 
 spotless {
