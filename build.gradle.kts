@@ -32,7 +32,7 @@ spotless {
   }
 }
 
-val r8: Configuration by configurations.creating
+val r8 by configurations.registering
 
 dependencies {
   implementation(libs.poi)
@@ -53,6 +53,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.jar {
+  // We don't need the standard jar.
   enabled = false
 }
 
@@ -90,54 +91,40 @@ tasks.shadowJar {
   )
 }
 
-val r8File = layout.buildDirectory.file("libs/$baseName-$version-r8.jar").map { it.asFile }
-val rulesFile = project.file("src/main/rules.pro")
 val r8Jar by tasks.registering(JavaExec::class) {
-  dependsOn(tasks.shadowJar)
+  group = LifecycleBasePlugin.BUILD_GROUP
 
-  val fatJarFile = tasks.shadowJar.get().archiveFile
-  inputs.file(fatJarFile)
-  inputs.file(rulesFile)
-  outputs.file(r8File)
+  val rulesFile = file("src/main/rules.pro")
+  val r8File = file("build/libs/$baseName-$version-r8.jar")
+  val binaryFile = file("build/libs/$baseName-$version-binary.jar")
+
+  inputs.files(tasks.shadowJar, rulesFile)
+  outputs.file(binaryFile)
 
   classpath(r8)
   mainClass = "com.android.tools.r8.R8"
   args(
     "--release",
     "--classfile",
-    "--output", r8File.get().path,
+    "--output", r8File.path,
     "--pg-conf", rulesFile.path,
     "--lib", providers.systemProperty("java.home").get(),
-    fatJarFile.get().toString(),
+    tasks.shadowJar.get().archiveFile.get().asFile.path,
   )
-}
 
-val binaryFile = layout.buildDirectory.file("libs/$baseName-$version-binary.jar").map { it.asFile }
-val binaryJar by tasks.registering {
-  dependsOn(r8Jar)
-
-  val r8FileProvider = layout.file(r8File)
-  val binaryFileProvider = layout.file(binaryFile)
-  inputs.files(r8FileProvider)
-  outputs.file(binaryFileProvider)
-
-  doLast {
-    val r8File = r8FileProvider.get().asFile
-    val binaryFile = binaryFileProvider.get().asFile
-
-    binaryFile.parentFile.mkdirs()
-    binaryFile.delete()
-    binaryFile.writeText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
-    binaryFile.appendBytes(r8File.readBytes())
-
-    binaryFile.setExecutable(true, false)
+  doLast("binaryJar") {
+    with(binaryFile) {
+      writeText($$"#!/bin/sh\n\nexec java $JAVA_OPTS -jar $0 \"$@\"\n\n")
+      appendBytes(r8File.readBytes())
+      setExecutable(true, false)
+    }
   }
 }
 
 tasks.test {
-  dependsOn(binaryJar)
+  dependsOn(r8Jar)
 
-  systemProperty("CLI_PATH", binaryFile.get().absolutePath)
+  systemProperty("CLI_PATH", r8Jar.get().outputs.files.singleFile.path)
   // https://github.com/tginsberg/junit5-system-exit/issues/10
   systemProperty("java.security.manager", "allow")
 
