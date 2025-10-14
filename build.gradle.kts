@@ -136,11 +136,10 @@ val binaryJar by tasks.registering {
 
 tasks.test {
   dependsOn(binaryJar)
+
   systemProperty("CLI_PATH", binaryFile.get().absolutePath)
-
-  useJUnitPlatform()
-  maxParallelForks = Runtime.getRuntime().availableProcessors()
-
   // https://github.com/tginsberg/junit5-system-exit/issues/10
   systemProperty("java.security.manager", "allow")
+
+  useJUnitPlatform()
 }
