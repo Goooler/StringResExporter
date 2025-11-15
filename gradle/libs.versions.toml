@@ -3,7 +3,7 @@ jdkRelease = "17"
 kotlin = "2.2.21"
 
 [libraries]
-poi = "org.apache.poi:poi:5.4.1"
+poi = "org.apache.poi:poi:5.5.0"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
 clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 
