@@ -23,7 +23,7 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew build
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: matrix.os == 'ubuntu-latest'
         with:
           name: string-res-exporter-binary
@@ -54,7 +54,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
       - name: Create release and upload binary.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
