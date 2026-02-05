@@ -7,7 +7,7 @@ poi = "org.apache.poi:poi:5.5.1"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
 clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 
-r8 = "com.android.tools:r8:8.13.17"
+r8 = "com.android.tools:r8:8.13.19"
 
 junit-bom = "org.junit:junit-bom:6.0.1"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
