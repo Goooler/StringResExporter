@@ -5,7 +5,7 @@ kotlin = "2.2.21"
 [libraries]
 poi = "org.apache.poi:poi:5.5.1"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
-clikt = "com.github.ajalt.clikt:clikt:5.0.3"
+clikt = "com.github.ajalt.clikt:clikt:5.1.0"
 
 r8 = "com.android.tools:r8:8.13.19"
 
