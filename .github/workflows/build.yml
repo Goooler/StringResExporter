@@ -24,7 +24,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew build
       - uses: actions/upload-artifact@v6
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-24.04-arm'
         with:
           name: string-res-exporter-binary
           path: build/libs/string-res-exporter-*-binary.jar
