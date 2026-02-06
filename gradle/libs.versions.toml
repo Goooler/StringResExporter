@@ -1,11 +1,11 @@
 [versions]
 jdkRelease = "17"
-kotlin = "2.2.21"
+kotlin = "2.3.10"
 
 [libraries]
 poi = "org.apache.poi:poi:5.5.1"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
-clikt = "com.github.ajalt.clikt:clikt:5.0.3"
+clikt = "com.github.ajalt.clikt:clikt:5.1.0"
 
 r8 = "com.android.tools:r8:9.0.32"
 
@@ -20,6 +20,6 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.8.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-buildconfig = "com.github.gmazzo.buildconfig:6.0.6"
-shadow = "com.gradleup.shadow:9.3.0"
-spotless = "com.diffplug.spotless:8.1.0"
+buildconfig = "com.github.gmazzo.buildconfig:6.0.7"
+shadow = "com.gradleup.shadow:9.3.1"
+spotless = "com.diffplug.spotless:8.2.1"
