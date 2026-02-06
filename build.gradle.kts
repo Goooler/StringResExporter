@@ -7,7 +7,7 @@ plugins {
   alias(libs.plugins.spotless)
 }
 
-version = "0.2.5"
+version = "0.3.0-SNAPSHOT"
 val baseName = "string-res-exporter"
 
 buildConfig {
