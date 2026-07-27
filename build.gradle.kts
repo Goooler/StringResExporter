@@ -115,7 +115,7 @@ val binaryJar = tasks.register("binaryJar") {
 tasks.test {
   dependsOn(binaryJar)
 
-  systemProperty("CLI_PATH", binaryJar.get().outputs.files.singleFile.path)
+  systemProperty("CLI_PATH", binaryJar.map { it.outputs.files.singleFile.path })
   // https://github.com/tginsberg/junit5-system-exit/issues/10
   systemProperty("java.security.manager", "allow")
 
