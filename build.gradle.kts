@@ -32,20 +32,18 @@ spotless {
   }
 }
 
-val r8 by configurations.registering
-
 dependencies {
   implementation(libs.poi)
   implementation(libs.jdom2)
   implementation(libs.clikt)
-
-  r8(libs.r8)
 
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.junit.systemExit)
   testImplementation(libs.assertk)
   testRuntimeOnly(libs.junit.platform.launcher)
+
+  shadowR8(libs.r8)
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -89,42 +87,35 @@ tasks.shadowJar {
     "r8-version.properties",
     "migrateToAndroidx/*",
   )
+
+  minimize {
+    r8 {
+      enableOptimization()
+      keepRuleFiles.from(file("src/main/rules.pro"))
+    }
+  }
 }
 
-val r8Jar by tasks.registering(JavaExec::class) {
+val binaryJar = tasks.register("binaryJar") {
   group = LifecycleBasePlugin.BUILD_GROUP
+  description = "Builds an executable binary JAR."
 
-  val rulesFile = file("src/main/rules.pro")
-  val r8File = file("build/libs/$baseName-$version-r8.jar")
-  val binaryFile = file("build/libs/$baseName-$version-binary.jar")
+  inputs.file(tasks.shadowJar.flatMap { it.archiveFile })
+  outputs.file(layout.buildDirectory.file("libs/$baseName-$version-binary.jar"))
 
-  inputs.files(tasks.shadowJar, rulesFile)
-  outputs.file(binaryFile)
-
-  classpath(r8)
-  mainClass = "com.android.tools.r8.R8"
-  args(
-    "--release",
-    "--classfile",
-    "--output", r8File.path,
-    "--pg-conf", rulesFile.path,
-    "--lib", providers.systemProperty("java.home").get(),
-    tasks.shadowJar.get().archiveFile.get().asFile.path,
-  )
-
-  doLast("binaryJar") {
-    with(binaryFile) {
+  doFirst {
+    with(outputs.files.singleFile) {
       writeText($$"#!/bin/sh\n\nexec java $JAVA_OPTS -jar $0 \"$@\"\n\n")
-      appendBytes(r8File.readBytes())
+      appendBytes(inputs.files.singleFile.readBytes())
       setExecutable(true, false)
     }
   }
 }
 
 tasks.test {
-  dependsOn(r8Jar)
+  dependsOn(binaryJar)
 
-  systemProperty("CLI_PATH", r8Jar.get().outputs.files.singleFile.path)
+  systemProperty("CLI_PATH", binaryJar.get().outputs.files.singleFile.path)
   // https://github.com/tginsberg/junit5-system-exit/issues/10
   systemProperty("java.security.manager", "allow")
 
