@@ -1,6 +1,6 @@
 [versions]
 jdkRelease = "17"
-kotlin = "2.3.10"
+kotlin = "2.4.10"
 
 [libraries]
 poi = "org.apache.poi:poi:5.5.1"
